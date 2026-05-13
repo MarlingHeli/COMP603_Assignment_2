@@ -1,4 +1,4 @@
-# COMP603_Assignment_1
+# COMP603_Assignment_2
 
 Feed Me Java! - a Java Quiz game with a fun story
 Created by Namrata Santhosh and Manling He
