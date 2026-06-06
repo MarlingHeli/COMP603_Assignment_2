@@ -10,4 +10,15 @@
         <maven.compiler.release>25</maven.compiler.release>
         <exec.mainClass>com.mycompany.pdac_assignment_1.PDAC_assignment_1</exec.mainClass>
     </properties>
+    
+    <dependencies>
+        <!-- add derby -->
+        <!-- Source: https://mvnrepository.com/artifact/org.apache.derby/derby -->
+        <dependency>
+            <groupId>org.apache.derby</groupId>
+            <artifactId>derby</artifactId>
+            <version>10.14.2.0</version>
+        </dependency>
+    </dependencies>
+            
 </project>

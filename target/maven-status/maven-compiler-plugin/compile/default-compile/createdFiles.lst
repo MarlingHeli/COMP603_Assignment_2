@@ -7,6 +7,7 @@ User_Interface\InputHelper.class
 User_Interface\Menu.class
 Persistence\UserRecord.class
 Model\User.class
+User_Interface\GUI.class
 User_Interface\StoryPrinter.class
 User_Interface\UI.class
 Persistence\UserRecordFileIO.class
