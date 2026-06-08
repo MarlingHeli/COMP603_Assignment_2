@@ -2,13 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package User_Interface;
+package User_Interface.Console;
 
 /**
  *
  * @author hmarl
  */
 
+import User_Interface.UI;
 import java.util.Scanner;
 
 public class CUI implements UI {

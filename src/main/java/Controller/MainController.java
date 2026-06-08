@@ -9,11 +9,11 @@ package Controller;
  * @author hmarl
  */
 
-import User_Interface.CUI;
+import User_Interface.Graphical.GUI;
 import User_Interface.UI;
-import User_Interface.Menu;
-import User_Interface.InputHelper;
-import User_Interface.StoryPrinter;
+import User_Interface.Console.Menu;
+import User_Interface.Console.InputHelper;
+import User_Interface.Console.StoryPrinter;
 import Question.Question;
 import Question.QuestionPool;
 import Persistence.UserRecordFileIO;
@@ -39,7 +39,7 @@ public class MainController {
 
     //define objects in constructor
     public MainController() {
-        ui = new CUI();
+        ui = new GUI();
         //pass on ui object to be used in menu
         menu = new Menu(ui);
         userRecord = new UserRecordFileIO();

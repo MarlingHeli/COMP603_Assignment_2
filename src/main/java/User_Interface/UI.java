@@ -16,6 +16,7 @@ public interface UI {
     void slowPrint(String text);
     
     
+    
 }
 
 
