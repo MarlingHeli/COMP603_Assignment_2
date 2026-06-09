@@ -10,8 +10,9 @@ package Controller;
  */
 
 import User_Interface.Graphical.GUI;
+//import User_Interface.Console.CUI;
 import User_Interface.UI;
-import User_Interface.Console.Menu;
+//import User_Interface.Console.Menu;
 import User_Interface.Console.InputHelper;
 import User_Interface.Console.StoryPrinter;
 import Question.Question;
@@ -29,21 +30,28 @@ public class MainController {
     int numQuestions = 10;
             
     private UI ui;
-    private Menu menu;
+    //private Menu menu;
     private UserRecord userRecord;
     private QuestionPool questionPool;
     private QuizSession quiz;
     private User user;
     private InputHelper inHelp;
-    private StoryPrinter storyPrint;
 
     //define objects in constructor
     public MainController() {
-        ui = new GUI();
+        GUI gui = new GUI();
+        gui.setVisible(true);
+
+        ui = gui;
+        
+        //ui = new CUI();
         //pass on ui object to be used in menu
-        menu = new Menu(ui);
+        //menu = new Menu(ui);
         userRecord = new UserRecordFileIO();
         questionPool = new QuestionPool();
+        
+        // I will eventually get rid of this:
+        inHelp = new InputHelper();
     }
 
     public static void main(String[] args) {
@@ -53,7 +61,7 @@ public class MainController {
     //display menu, will loop until user exits
     public void start() {
         while (true) {
-            int choice = menu.displayMenu();
+            int choice = ui.showMenu();
 
             switch (choice) {
                 case 1 -> startNewGame();
@@ -66,8 +74,10 @@ public class MainController {
     }
 
     public void startNewGame() {
-        String username = ui.getUserInput("Enter username: ");
-        String petName = ui.getUserInput("Enter pet name: ");
+        String username =
+            ui.getUserInput("Enter username: ");
+        String petName =
+                ui.getUserInput("Enter pet name: ");
         
         //keep existing highScore if user file already exists
         user = userRecord.loadRecord(username);
@@ -75,17 +85,17 @@ public class MainController {
         if (user == null) {
             user = new User(username, petName, 0);
         }
+        
         //update petName in case users have existing file but want to start
         //new game and change pet name
         user.setPetName(petName);
-                
-        //ask to display introduction
-        String introChoice = ui.getUserInput("Enter anything to view "
-                + "introduction, or type \"s\" to skip: ");
 
-        if(!introChoice.equalsIgnoreCase("s")) {
-            storyPrint.showIntro(ui, username, petName);
-        }
+        ui.printStory(username, petName);
+  
+        ui.printStory(user.getUsername(),
+              user.getPetName());
+       
+        
         
         //fetch generated questions with size as arg
         List<Question> questions = questionPool.getRandomQuestions(numQuestions);

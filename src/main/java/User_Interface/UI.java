@@ -14,6 +14,10 @@ public interface UI {
     void displayError(String text);
     String getUserInput(String prompt);
     void slowPrint(String text);
+    int showMenu ();
+    void printStory(String user, String pet);
+    //int showQuiz();
+    //int showResults();
     
     
     

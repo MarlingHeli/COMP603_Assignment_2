@@ -14,7 +14,50 @@ import java.util.Scanner;
 
 public class CUI implements UI {
     private Scanner scanner = new Scanner(System.in);
+    private StoryPrinter storyPrint;
+    
+    public CUI() {
+        storyPrint = new StoryPrinter();
+    }
 
+    //oops, let me know if I should make this into a class again, but under CUI.java to stick to proper OOP...
+    @Override
+    public int showMenu (){
+        displayText("\n=== Feed Me Java! ===");
+        displayText("1. Start New Game");
+        displayText("2. Load Game");
+        displayText("3. Exit");
+
+        try {
+            return Integer.parseInt(getUserInput("Choose option (1/2/3): "));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+    
+    @Override
+    public void printStory(String user, String pet) {
+        //ask to display introduction
+        String introChoice = getUserInput("Enter anything to view "
+                + "introduction, or type \"s\" to skip: ");
+
+        if(!introChoice.equalsIgnoreCase("s")) {
+            storyPrint.showIntro(this, user, pet);
+        }
+    }
+    
+    /*
+    @Override
+    int showQuiz(){
+        return 0;
+    }
+    
+    @Override
+    int showResults(){
+        return 0;
+    }
+    */
+    
     @Override
     public void displayText(String text) {
         System.out.println(text);
