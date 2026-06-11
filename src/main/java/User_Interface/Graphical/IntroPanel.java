@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class IntroPanel extends JPanel {
+    private Runnable onFinish;
 
     private JTextArea storyText;
     private JLabel imageLabel;
@@ -25,9 +26,13 @@ public class IntroPanel extends JPanel {
 
     private String[] storyPages;
     
-    public IntroPanel(String user, String pet) {
+    
+    
+    public IntroPanel(String user, String pet, Runnable onFinish) {
+        System.out.println("IntroPanel created");
         this.user = user;
         this.pet = pet;
+        this.onFinish = onFinish;
         
         setLayout(new BorderLayout());
         
@@ -45,31 +50,26 @@ public class IntroPanel extends JPanel {
 
             "\"Where did you go, buddy?\" I pulled "
             + pet
-            + " into my arms.",
+            + " into my arms."+
+            "\n\"You're always so adventurous.\"",
 
-            "\"You're always so adventurous.\"",
-
-            "\"I passed by the Animal University of Technology today.\"",
-
-            "\"There's a Java competition going on,\" "
+            "\"I passed by the Animal University of Technology today.\""+
+            "\n\"There's a Java competition going on,\" "
             + pet
-            + " announced.",
-
+            + " announced."+
             "\"I have enrolled you, "
             + user
             + ".\"",
 
-            "\"Why!? I don't know much Java,\" I protested.",
+            "\"Why!? I don't know much Java!\" I protested.",
 
-            "\"Because first place wins a lifetime supply of pet food.",
-
-            "And I plan to FEAST!\" "
+            "\"Because first place wins a lifetime supply of pet food."+
+            "\nAnd I plan to FEAST!\" "
             + pet
             + " cackled.",
 
-            "I paused.",
-
-            "\"Well, it would spare my wallet...\""
+            "I paused."+
+            "\n\"Well, it would spare my wallet...\""
         };
 
         showIntroduction();
@@ -104,12 +104,14 @@ public class IntroPanel extends JPanel {
     }
     
     private void showIntroduction() {
+        System.out.println("Showing introduction");
 
         removeAll();
 
-        JLabel introLabel =
-            new JLabel("=== INTRODUCTION ===");
+        JLabel introLabel = new JLabel("=== INTRODUCTION ===");
+        introLabel.setFont( new Font("Serif", Font.BOLD, 42));
 
+        
         introLabel.setHorizontalAlignment(
             SwingConstants.CENTER
         );
@@ -119,7 +121,7 @@ public class IntroPanel extends JPanel {
         revalidate();
         repaint();
 
-        Timer timer = new Timer(3000, e -> {
+        Timer timer = new Timer(1500, e -> {
 
             currentPage = 1;
 
@@ -133,15 +135,21 @@ public class IntroPanel extends JPanel {
     }
     
     private void showStoryPage() {
+        System.out.println("Showing page " + currentPage);
 
         removeAll();
 
         JPanel centerPanel = new JPanel(
             new BorderLayout()
         );
-
+        
         storyText = new JTextArea();
-
+        storyText.setPreferredSize(new Dimension(800, 220));
+        storyText.setFont(new Font("Serif", Font.PLAIN, 28));
+        storyText.setLineWrap(true);
+        storyText.setWrapStyleWord(true);
+        storyText.setOpaque(false);
+        storyText.setEditable(false);
         storyText.setEditable(false);
 
         imageLabel = new JLabel();
@@ -150,9 +158,16 @@ public class IntroPanel extends JPanel {
             new Dimension(300,300)
         );
 
-        centerPanel.add(storyText,
-                        BorderLayout.NORTH);
+//      centerPanel.add(storyText, BorderLayout.NORTH);
+        JPanel textWrapper = new JPanel(new BorderLayout());
 
+        // Transparent so background can show through
+        textWrapper.setOpaque(false);
+        // 40px padding on top
+        textWrapper.setBorder(BorderFactory.createEmptyBorder(40, 20, 20, 20));
+        textWrapper.add(storyText, BorderLayout.CENTER);
+        centerPanel.add(textWrapper, BorderLayout.NORTH);
+        
         centerPanel.add(imageLabel,
                         BorderLayout.CENTER);
 
@@ -198,11 +213,14 @@ public class IntroPanel extends JPanel {
     }
     
     private void finishStory() {
-
         JOptionPane.showMessageDialog(
             this,
             "Story Complete!"
         );
+
+        if (onFinish != null) {
+            onFinish.run();
+        }
     }
     
     

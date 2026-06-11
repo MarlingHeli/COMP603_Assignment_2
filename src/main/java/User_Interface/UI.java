@@ -15,7 +15,7 @@ public interface UI {
     String getUserInput(String prompt);
     void slowPrint(String text);
     int showMenu ();
-    void printStory(String user, String pet);
+    void printStory(String user, String pet, Runnable onFinish);
     //int showQuiz();
     //int showResults();
     

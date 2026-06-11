@@ -36,14 +36,23 @@ public class CUI implements UI {
     }
     
     @Override
-    public void printStory(String user, String pet) {
-        //ask to display introduction
-        String introChoice = getUserInput("Enter anything to view "
-                + "introduction, or type \"s\" to skip: ");
+        public void printStory(
+               String user,
+               String pet,
+               Runnable onFinish) {
 
-        if(!introChoice.equalsIgnoreCase("s")) {
-            storyPrint.showIntro(this, user, pet);
-        }
+           String introChoice = getUserInput(
+               "Enter anything to view introduction, or type \"s\" to skip: "
+           );
+
+           if (!introChoice.equalsIgnoreCase("s")) {
+               storyPrint.showIntro(this, user, pet);
+           }
+
+           // Tell the controller the story is finished
+           if (onFinish != null) {
+               onFinish.run();
+           }
     }
     
     /*

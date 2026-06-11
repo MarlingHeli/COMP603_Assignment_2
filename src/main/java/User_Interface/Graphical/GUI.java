@@ -4,6 +4,8 @@ import User_Interface.UI;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
 
 public class GUI extends JFrame implements UI {
 
@@ -50,8 +52,7 @@ public class GUI extends JFrame implements UI {
         dialog.setSize(900, 700);
         dialog.setLocationRelativeTo(null);
         
-        //backgroundImage = new ImageIcon(getClass().getResource("/FeedMeJavaBg.png")).getImage();
-        JPanel panel = new BackgroundPanel();
+        JPanel panel = new BackgroundPanel("/FeedMeJavaBg.png");
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         JButton startButton = new JButton("Start New Game");
@@ -93,12 +94,11 @@ public class GUI extends JFrame implements UI {
     }
     
     @Override
-    public void printStory(String user, String pet) {
+    public void printStory(String user, String pet, Runnable onFinish) {
 
         getContentPane().removeAll();
-        
-        setVisible(true);
-        add(new IntroPanel(user, pet));
+
+        add(new IntroPanel(user, pet, onFinish));
 
         revalidate();
         repaint();
@@ -125,40 +125,80 @@ public class GUI extends JFrame implements UI {
     public void displayError(String text) {
         errorField.setText(text);
     }
-
     @Override
     public String getUserInput(String prompt) {
 
-        displayText(prompt);
+        // Clear current screen
+        getContentPane().removeAll();
+
+        // Create a centered panel
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+
+        JLabel promptLabel = new JLabel(prompt);
+        promptLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         inputField.setText("");
-        inputField.requestFocusInWindow();
+        inputField.setMaximumSize(new Dimension(300, 30));
+        inputField.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        centerPanel.add(Box.createVerticalGlue());
+        centerPanel.add(promptLabel);
+        centerPanel.add(Box.createVerticalStrut(20));
+        centerPanel.add(inputField);
+        centerPanel.add(Box.createVerticalStrut(10));
+        centerPanel.add(submitButton);
+        centerPanel.add(Box.createVerticalGlue());
+
+        add(centerPanel, BorderLayout.CENTER);
+
+        revalidate();
+        repaint();
 
         final String[] result = new String[1];
+        
+        ActionListener submitAction = e -> {
+            String input = inputField.getText().trim();
 
-        submitButton.addActionListener(e -> {
-            result[0] = inputField.getText();
+            // Reject empty input
+            if (input.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Please enter a value."
+                );
+                return;
+            }
+
+            result[0] = input;
 
             synchronized (result) {
                 result.notify();
             }
-        });
+        };
+
+        // Click Submit button
+        submitButton.addActionListener(submitAction);
+
+        // Press Enter in text field
+        inputField.addActionListener(submitAction);
+        
+
+        inputField.requestFocusInWindow();
 
         synchronized (result) {
-
             while (result[0] == null) {
-
                 try {
                     result.wait();
-
                 } catch (InterruptedException ex) {
-
                     Thread.currentThread().interrupt();
                 }
             }
         }
-        //submitButton.removeActionListener(listener);
-        
+
+        submitButton.removeActionListener(submitAction);
+        inputField.removeActionListener(submitAction);
         return result[0];
     }
 

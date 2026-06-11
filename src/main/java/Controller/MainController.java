@@ -64,7 +64,9 @@ public class MainController {
             int choice = ui.showMenu();
 
             switch (choice) {
-                case 1 -> startNewGame();
+                case 1 -> { startNewGame();
+                            return;
+                        }
                 case 2 -> loadGame();
                 case 3 -> exit();
                 //menu returns -1 if invalid input
@@ -74,6 +76,30 @@ public class MainController {
     }
 
     public void startNewGame() {
+        String username = ui.getUserInput("Enter username: ");
+        String petName = ui.getUserInput("Enter pet name: ");
+        
+        //keep existing highScore if user file already exists
+        user = userRecord.loadRecord(username);
+        //create new user if user file does not exist
+        if (user == null) {
+            user = new User(username, petName, 0);
+        }
+        
+        //update petName in case users have existing file but want to start
+        //new game and change pet name
+        user.setPetName(petName);
+        System.out.println("1. Before printStory");
+
+        //ui.printStory(username, petName);
+        ui.printStory(username, petName, () -> {
+            beginQuiz(username, petName);} 
+        );
+
+        System.out.println("2. After printStory");
+             
+        
+        /*
         String username =
             ui.getUserInput("Enter username: ");
         String petName =
@@ -89,13 +115,10 @@ public class MainController {
         //update petName in case users have existing file but want to start
         //new game and change pet name
         user.setPetName(petName);
-
-        ui.printStory(username, petName);
-  
-        ui.printStory(user.getUsername(),
-              user.getPetName());
-       
         
+//        System.out.println("Before printStory");
+        ui.printStory(username, petName);
+//        System.out.println("After printStory");
         
         //fetch generated questions with size as arg
         List<Question> questions = questionPool.getRandomQuestions(numQuestions);
@@ -107,6 +130,26 @@ public class MainController {
         quiz = new QuizSession(0, questions, 0, user);
         //TESTING HIGHSCORE
 //        System.out.println("HIGHSCORE "+ quiz.getUser().getHighScore());
+        runQuiz();
+        */
+        System.out.println("startNewGame finished");
+    }
+    
+    public void beginQuiz(String username, String petName){
+        List<Question> questions = questionPool.getRandomQuestions(numQuestions);
+
+        System.out.println("3. Questions loaded");
+
+        ui.getUserInput("Enter anything to continue...");
+
+        System.out.println("4. Continue pressed");
+
+        quiz = new QuizSession(
+            0, questions, 0, user
+        );
+
+        System.out.println("5. Starting quiz");
+
         runQuiz();
     }
     
@@ -129,6 +172,7 @@ public class MainController {
     }
 
     private void runQuiz() {
+        System.out.println("Inside runQuiz()");
         //fetch generated questions
         List<Question> questions = quiz.getQuestions();
 
