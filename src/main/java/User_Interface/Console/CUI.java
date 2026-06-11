@@ -11,6 +11,10 @@ package User_Interface.Console;
 
 import User_Interface.UI;
 import java.util.Scanner;
+import Model.QuizSession;
+import Question.Question;
+import Model.User;
+import java.util.List;
 
 public class CUI implements UI {
     private Scanner scanner = new Scanner(System.in);
@@ -55,17 +59,17 @@ public class CUI implements UI {
            }
     }
     
-    /*
-    @Override
-    int showQuiz(){
-        return 0;
-    }
     
     @Override
-    int showResults(){
-        return 0;
+    public void showQuiz(List<Question> questions, User user){
+        QuizSession quiz = new QuizSession(0, questions, 0, user);
     }
-    */
+    
+//    @Override
+//    public void showResults(){
+//        return 0;
+//    }
+    
     
     @Override
     public void displayText(String text) {

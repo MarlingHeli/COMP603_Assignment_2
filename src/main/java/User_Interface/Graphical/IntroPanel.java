@@ -202,7 +202,7 @@ public class IntroPanel extends JPanel {
 
             } else {
 
-                finishStory();
+                if(onFinish != null) {onFinish.run();}
 
             }
 

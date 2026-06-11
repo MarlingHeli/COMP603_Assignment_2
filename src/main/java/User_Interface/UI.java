@@ -9,6 +9,10 @@ package User_Interface;
  * @author hmarl
  */
 
+import Question.Question;
+import Model.User;
+import java.util.List;
+
 public interface UI {
     void displayText(String text);
     void displayError(String text);
@@ -16,8 +20,8 @@ public interface UI {
     void slowPrint(String text);
     int showMenu ();
     void printStory(String user, String pet, Runnable onFinish);
-    //int showQuiz();
-    //int showResults();
+    void showQuiz(List<Question> questions, User user);
+    //void showResults();
     
     
     

@@ -86,71 +86,18 @@ public class MainController {
             user = new User(username, petName, 0);
         }
         
-        //update petName in case users have existing file but want to start
-        //new game and change pet name
+//      update petName in case users have existing file but want to start
+//      new game and change pet name
         user.setPetName(petName);
         System.out.println("1. Before printStory");
 
-        //ui.printStory(username, petName);
-        ui.printStory(username, petName, () -> {
-            beginQuiz(username, petName);} 
-        );
+        List<Question> questions = questionPool.getRandomQuestions(numQuestions);   
+        
+        ui.printStory(username, petName, () -> ui.showQuiz(questions, user));
 
         System.out.println("2. After printStory");
              
-        
-        /*
-        String username =
-            ui.getUserInput("Enter username: ");
-        String petName =
-                ui.getUserInput("Enter pet name: ");
-        
-        //keep existing highScore if user file already exists
-        user = userRecord.loadRecord(username);
-        //create new user if user file does not exist
-        if (user == null) {
-            user = new User(username, petName, 0);
-        }
-        
-        //update petName in case users have existing file but want to start
-        //new game and change pet name
-        user.setPetName(petName);
-        
-//        System.out.println("Before printStory");
-        ui.printStory(username, petName);
-//        System.out.println("After printStory");
-        
-        //fetch generated questions with size as arg
-        List<Question> questions = questionPool.getRandomQuestions(numQuestions);
-        ui.displayText("\nQuest: You will now attempt the Java competition!");
-        ui.getUserInput("Enter anything to continue...");
-        ui.displayText("");
-        
-        //create QuizSession object
-        quiz = new QuizSession(0, questions, 0, user);
-        //TESTING HIGHSCORE
-//        System.out.println("HIGHSCORE "+ quiz.getUser().getHighScore());
-        runQuiz();
-        */
         System.out.println("startNewGame finished");
-    }
-    
-    public void beginQuiz(String username, String petName){
-        List<Question> questions = questionPool.getRandomQuestions(numQuestions);
-
-        System.out.println("3. Questions loaded");
-
-        ui.getUserInput("Enter anything to continue...");
-
-        System.out.println("4. Continue pressed");
-
-        quiz = new QuizSession(
-            0, questions, 0, user
-        );
-
-        System.out.println("5. Starting quiz");
-
-        runQuiz();
     }
     
 

@@ -1,11 +1,14 @@
 package User_Interface.Graphical;
 
+import Model.User;
+import Question.Question;
 import User_Interface.UI;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class GUI extends JFrame implements UI {
 
@@ -206,4 +209,36 @@ public class GUI extends JFrame implements UI {
     public void slowPrint(String text) {
         return;
     }
+
+    @Override
+    public void showQuiz(List<Question> questions, User user) {
+
+        getContentPane().removeAll();
+
+        add(new QuizPanel());
+
+        revalidate();
+        repaint();
+    }
+    
+    public void showResult(
+        boolean correct,
+        int score,
+        String explanation
+    ) {
+
+        getContentPane().removeAll();
+
+        add(
+            new ResultPanel(
+                correct,
+                score,
+                explanation
+            )
+        );
+
+        revalidate();
+        repaint();
+    }
+    
 }
