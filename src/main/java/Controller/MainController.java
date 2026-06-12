@@ -100,11 +100,16 @@ public class MainController {
             user
         );
         
-        ui.printStory(username, petName, () -> ui.showQuiz(quiz));
+        ui.printStory(
+            username,
+            petName,
+            () -> ui.showQuiz(
+                quiz,
+                () -> finishQuiz()
+    )
+);
 
-        System.out.println("2. After printStory");
-             
-        System.out.println("startNewGame finished");
+
     }
     
 
@@ -122,37 +127,26 @@ public class MainController {
         ui.displayText("Saved File Found!!");
         ui.slowPrint("Returning where you left off...\n");
         
-//        runQuiz();
+        ui.showQuiz(
+            quiz,
+            () -> finishQuiz()
+        );
+        
     }
 
 
     private void finishQuiz() {
-//        int score = quiz.getNumCorrectAnswers();
-//        int totalQuestions = quiz.getQuestions().size();
-        //get trophy type
-        String result = quiz.calculateResult();
-        
-        ui.displayText("\n=== RESULTS ===");
-        // 1. Show score + result
-        ui.displayText(quiz.getScoreText());
-        ui.displayText("Result: " + result + "\n");
-        
-        //play a concluding scene from bro
-                
-        //only keep highest score in user file
-        user.saveHighestScore(quiz.getNumCorrectAnswers());
-        //save game
+        // Save highest score
+        user.saveHighestScore(
+            quiz.getNumCorrectAnswers()
+        );
+
+        // Save user + game
         userRecord.saveRecord(user);
         userRecord.saveGame(quiz);
-        
-        // 3. Ask to continue
-        //added error checking
-        String continueChoice = inHelp.getYesNo(ui, "Would you like to like to return to menu? (y/n): ");
 
-        if (continueChoice.equalsIgnoreCase("n")) {
-            exit();
-        }
-        // if yes -> returns to menu automatically because of while true loop
+        // Let UI display ending screen
+        ui.showEnd(quiz, () -> start());
     }
 
     private void handleExitDuringGame() {

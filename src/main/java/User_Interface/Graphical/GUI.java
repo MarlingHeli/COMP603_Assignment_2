@@ -106,18 +106,6 @@ public class GUI extends JFrame implements UI {
         revalidate();
         repaint();
     }
-    
-    /*
-    @Override
-    int showQuiz(){
-        return 0;
-    }
-    
-    @Override
-    int showResults(){
-        return 0;
-    }
-    */
 
     @Override
     public void displayText(String text) {
@@ -211,16 +199,28 @@ public class GUI extends JFrame implements UI {
     }
 
     @Override
-    public void showQuiz(QuizSession quiz) {
+    public void showQuiz(
+        QuizSession quiz,
+        Runnable onFinish
+    ) {
+        getContentPane().removeAll();
 
-       getContentPane().removeAll();
+        // Get current question from QuizSession
+        Question q =
+            quiz.getCurrentQuestion();
 
-       Question q = quiz.getCurrentQuestion();
+        // Pass callback into QuizPanel
+        add(
+            new QuizPanel(
+                q,
+                quiz,
+                this,
+                onFinish
+            )
+        );
 
-       add(new QuizPanel(q, quiz, this));
-
-       revalidate();
-       repaint();
+        revalidate();
+        repaint();
     }
     
    public void showResult(
@@ -244,14 +244,18 @@ public class GUI extends JFrame implements UI {
         repaint();
     }
    
-   public void showEnd(QuizSession quiz) {
+    @Override
+    public void showEnd(QuizSession quiz,Runnable onFinish) {
+        
         getContentPane().removeAll();
 
-        JLabel result = new JLabel(
-            quiz.getScoreText()
+        add(
+            new EndPanel(
+                quiz,
+                this,
+                onFinish
+            )
         );
-
-        add(result, BorderLayout.CENTER);
 
         revalidate();
         repaint();

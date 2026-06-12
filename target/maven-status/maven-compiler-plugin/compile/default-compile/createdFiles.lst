@@ -12,6 +12,7 @@ User_Interface\Graphical\QuizPanel.class
 Persistence\UserRecord.class
 User_Interface\Graphical\ResultPanel.class
 Model\ModelListener.class
+User_Interface\Graphical\EndPanel.class
 Model\User.class
 User_Interface\Graphical\IntroPanel.class
 User_Interface\Graphical\GUI.class
