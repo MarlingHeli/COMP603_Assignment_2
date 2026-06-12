@@ -49,4 +49,13 @@ public class MultiChoiceQuestion implements Question {
     public int getQuestionID() {
         return id;
     }
+    
+    @Override
+    public String[] getOptions() {
+        return new String[] {
+            "A. Dog",
+            "B. Cat",
+            "C. Bird"
+        };
+    }
 }

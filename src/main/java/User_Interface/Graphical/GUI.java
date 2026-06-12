@@ -1,14 +1,14 @@
 package User_Interface.Graphical;
 
-import Model.User;
+import Model.QuizSession;
 import Question.Question;
+import User_Interface.Graphical.QuizPanel;
 import User_Interface.UI;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 public class GUI extends JFrame implements UI {
 
@@ -211,31 +211,47 @@ public class GUI extends JFrame implements UI {
     }
 
     @Override
-    public void showQuiz(List<Question> questions, User user) {
+    public void showQuiz(QuizSession quiz) {
 
-        getContentPane().removeAll();
+       getContentPane().removeAll();
 
-        add(new QuizPanel());
+       Question q = quiz.getCurrentQuestion();
 
-        revalidate();
-        repaint();
+       add(new QuizPanel(q, quiz, this));
+
+       revalidate();
+       repaint();
     }
     
-    public void showResult(
+   public void showResult(
         boolean correct,
-        int score,
-        String explanation
+        QuizSession quiz,
+        String explanation,
+        Runnable onNext
     ) {
-
         getContentPane().removeAll();
 
         add(
             new ResultPanel(
                 correct,
-                score,
-                explanation
+                quiz,
+                explanation,
+                onNext
             )
         );
+
+        revalidate();
+        repaint();
+    }
+   
+   public void showEnd(QuizSession quiz) {
+        getContentPane().removeAll();
+
+        JLabel result = new JLabel(
+            quiz.getScoreText()
+        );
+
+        add(result, BorderLayout.CENTER);
 
         revalidate();
         repaint();
