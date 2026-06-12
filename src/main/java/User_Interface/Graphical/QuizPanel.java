@@ -16,11 +16,13 @@ public class QuizPanel extends JPanel {
     private Question question;
     private QuizSession quiz;
     private GUI gui;
+    private Runnable onFinish;
 
     public QuizPanel(
         Question question,
         QuizSession quiz,
-        GUI gui
+        GUI gui,
+        Runnable onFinish
     ) {
         this.question = question;
         this.quiz = quiz;
@@ -117,11 +119,11 @@ public class QuizPanel extends JPanel {
                     if (quiz.getCurrentQuestionIndex()
                         < quiz.getQuestions().size()) {
 
-                        gui.showQuiz(quiz);
+                        gui.showQuiz(quiz, onFinish);
 
-                    } else {
-
-                        gui.showEnd(quiz);
+                    }
+                    else {
+                        onFinish.run();
                     }
                 }
             );

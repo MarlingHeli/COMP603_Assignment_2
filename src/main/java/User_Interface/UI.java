@@ -18,8 +18,8 @@ public interface UI {
     void slowPrint(String text);
     int showMenu ();
     void printStory(String user, String pet, Runnable onFinish);
-    void showQuiz(QuizSession quiz);
-    //void showResults();
+    void showQuiz(QuizSession quiz, Runnable onFinish);
+    void showEnd(QuizSession quiz, Runnable onFinish);
     
     
     

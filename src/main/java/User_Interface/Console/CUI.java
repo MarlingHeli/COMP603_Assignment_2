@@ -60,15 +60,22 @@ public class CUI implements UI {
     }
     
     
-   @Override
-    public void showQuiz(QuizSession quiz) {
+     @Override
+    public void showQuiz(
+        QuizSession quiz,
+        Runnable onFinish
+    ) {
+        while (
+            quiz.getCurrentQuestionIndex()
+            < quiz.getQuestions().size()
+        ) {
 
-        while (quiz.getCurrentQuestionIndex()
-                < quiz.getQuestions().size()) {
+            Question q =
+                quiz.getCurrentQuestion();
 
-            Question q = quiz.getCurrentQuestion();
-
-            displayText(q.getQuestionText());
+            displayText(
+                q.getQuestionText()
+            );
 
             String input =
                 getUserInput("Answer: ");
@@ -82,12 +89,59 @@ public class CUI implements UI {
                 displayText("Wrong");
             }
         }
+
+        // quiz finished → notify controller
+        if (onFinish != null) {
+            onFinish.run();
+        }
     }
     
-//    @Override
-//    public void showResults(){
-//        return 0;
-//    }
+    @Override
+    public void showEnd(
+        QuizSession quiz,
+        Runnable onFinish
+    ) {
+
+        // heading
+        displayText("\n=== RESULTS ===");
+
+        // final score
+        displayText(
+            quiz.getScoreText()
+        );
+
+        // trophy
+        displayText(
+            "Trophy: "
+            + quiz.getTrophy()
+        );
+
+        // ending dialogue
+        displayText(
+            quiz.getEndingDialogue()
+        );
+
+        getUserInput(
+            "Press Enter to continue..."
+        );
+
+        String choice =
+            getUserInput(
+                "Return to menu? (y/n): "
+            );
+
+        if(choice.equalsIgnoreCase("n")) {
+            displayText(
+                "Thanks for playing!"
+            );
+            System.exit(0);
+        }
+
+        // return control to controller
+        if(onFinish != null) {
+            onFinish.run();
+        }
+    }
     
     
     @Override
