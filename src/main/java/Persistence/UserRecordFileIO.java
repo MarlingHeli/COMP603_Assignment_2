@@ -8,8 +8,7 @@ import Question.QuestionPool;
 import java.io.*;
 import java.util.*;
 
-//not guaranteed to work anymore
-public class UserRecordFileIO implements UserRecord, QuizRecord {
+public class UserRecordFileIO implements UserRecord {
 
     private final String FOLDER = "saves/";
 
@@ -48,9 +47,9 @@ public class UserRecordFileIO implements UserRecord, QuizRecord {
     }
 
     @Override
-    public QuizSession loadGame(User user) {
+    public QuizSession loadGame(String username) {
         try {
-            File file = new File(FOLDER + user.getUsername().trim() + "_game.txt");
+            File file = new File(FOLDER + username.trim() + "_game.txt");
 
             if (!file.exists()) {
                 return null;
@@ -83,7 +82,7 @@ public class UserRecordFileIO implements UserRecord, QuizRecord {
 //            User user = new User(name, petName, highScore);
             //start using loadRecord method to retrieve user data
             //help separate user and game data
-            user = loadRecord(user.getUsername());
+            User user = loadRecord(username);
             QuestionPool pool = new QuestionPool();
             List<Question> questions = new ArrayList<>();
 

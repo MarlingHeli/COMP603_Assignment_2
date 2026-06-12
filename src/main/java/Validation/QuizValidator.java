@@ -2,12 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Model;
+package Validation;
 
 /**
  *
- * @author hmarl
+ * @author 2
  */
-public interface ModelListener {
-    
+public class QuizValidator {
+
+    public static boolean canSubmitAnswer(
+            String answer) {
+
+        return answer != null;
+    }
 }

@@ -1,3 +1,0 @@
-username=p
-petName=o
-highScore=0

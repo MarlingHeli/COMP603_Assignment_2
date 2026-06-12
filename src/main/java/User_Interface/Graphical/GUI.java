@@ -3,6 +3,7 @@ package User_Interface.Graphical;
 import Model.QuizSession;
 import Question.Question;
 import User_Interface.Graphical.QuizPanel;
+import Validation.InputValidator;
 import User_Interface.UI;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -154,7 +155,7 @@ public class GUI extends JFrame implements UI {
             String input = inputField.getText().trim();
 
             // Reject empty input
-            if (input.isEmpty()) {
+            if (!InputValidator.validStr(input)) {
                 JOptionPane.showMessageDialog(
                     this,
                     "Please enter a value."
