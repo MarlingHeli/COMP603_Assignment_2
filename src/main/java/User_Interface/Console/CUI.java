@@ -60,9 +60,28 @@ public class CUI implements UI {
     }
     
     
-    @Override
-    public void showQuiz(List<Question> questions, User user){
-        QuizSession quiz = new QuizSession(0, questions, 0, user);
+   @Override
+    public void showQuiz(QuizSession quiz) {
+
+        while (quiz.getCurrentQuestionIndex()
+                < quiz.getQuestions().size()) {
+
+            Question q = quiz.getCurrentQuestion();
+
+            displayText(q.getQuestionText());
+
+            String input =
+                getUserInput("Answer: ");
+
+            if (q.checkAnswer(input)) {
+                quiz.answerCorrect();
+                displayText("Correct");
+            }
+            else {
+                quiz.answerWrong();
+                displayText("Wrong");
+            }
+        }
     }
     
 //    @Override

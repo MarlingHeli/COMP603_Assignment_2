@@ -93,7 +93,14 @@ public class MainController {
 
         List<Question> questions = questionPool.getRandomQuestions(numQuestions);   
         
-        ui.printStory(username, petName, () -> ui.showQuiz(questions, user));
+        quiz = new QuizSession(
+            0,
+            questions,
+            0,
+            user
+        );
+        
+        ui.printStory(username, petName, () -> ui.showQuiz(quiz));
 
         System.out.println("2. After printStory");
              
@@ -115,55 +122,9 @@ public class MainController {
         ui.displayText("Saved File Found!!");
         ui.slowPrint("Returning where you left off...\n");
         
-        runQuiz();
+//        runQuiz();
     }
 
-    private void runQuiz() {
-        System.out.println("Inside runQuiz()");
-        //fetch generated questions
-        List<Question> questions = quiz.getQuestions();
-
-        //iterate through questions list, starting at CurrentQuestionIndex
-        //suitable for continuing off a save file and starting new game
-        for (int i = quiz.getCurrentQuestionIndex(); i < questions.size(); i++) {         
-            //get Question object (element) at index i in questions list
-            Question q = questions.get(i);
-            int questionNumber = i + 1;
-            //display current question number starting at 1
-            ui.displayText("\n=== QUESTION: "+ questionNumber + " ===");
-            //get question text
-            ui.displayText(q.getQuestionText());
-
-            String input = inHelp.getQuizAnswer(ui);
-            
-            //check user input
-            if (input.equalsIgnoreCase("quit"))
-            {
-                handleExitDuringGame();
-                return;
-            }
-            //check if user answer matches answer
-            else if (q.checkAnswer(input)) {
-                quiz.answerCorrect();
-                ui.displayText("Correct!");
-            } 
-            else 
-            {
-                quiz.answerWrong();
-                ui.displayText("Incorrect.");
-            }
-            
-            //display question explanation
-            ui.displayText(questions.get(i).getExplanation());
-            //display current score
-            ui.displayText("Score: " + quiz.getNumCorrectAnswers()+ "/"
-                    + questions.size());
-            ui.getUserInput("Enter anything to continue:");
-        }
-
-        //goes to finishQuiz if users try to load a game that has already finished
-        finishQuiz();   // occurs after all questions
-    }
 
     private void finishQuiz() {
 //        int score = quiz.getNumCorrectAnswers();

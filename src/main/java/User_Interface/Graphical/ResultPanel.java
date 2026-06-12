@@ -10,65 +10,54 @@ package User_Interface.Graphical;
  */
 import javax.swing.*;
 import java.awt.*;
+import Model.QuizSession;
 
 public class ResultPanel extends JPanel {
 
     public ResultPanel(
         boolean correct,
-        int score,
-        String explanation
+        QuizSession quiz,
+        String explanation,
+        Runnable onNext
     ) {
 
-        setLayout(
-            new BorderLayout()
-        );
+        setLayout(new BorderLayout());
 
         JLabel resultLabel =
             new JLabel(
-                correct
-                ? "CORRECT!"
-                : "INCORRECT"
+                correct ? "CORRECT!" : "INCORRECT"
             );
 
         resultLabel.setFont(
-            new Font(
-                "Arial",
-                Font.BOLD,
-                42
-            )
+            new Font("Arial", Font.BOLD, 42)
         );
 
         resultLabel.setForeground(
-            correct
-            ? Color.GREEN
-            : Color.RED
+            correct ? Color.GREEN : Color.RED
         );
 
-        add(
-            resultLabel,
-            BorderLayout.NORTH
+        resultLabel.setHorizontalAlignment(
+            SwingConstants.CENTER
         );
+
+        add(resultLabel, BorderLayout.NORTH);
 
         JTextArea explanationArea =
-            new JTextArea(
-                explanation
-            );
+            new JTextArea(explanation);
 
-        explanationArea.setEditable(
-            false
-        );
+        explanationArea.setEditable(false);
 
-        add(
-            explanationArea,
-            BorderLayout.CENTER
-        );
+        add(explanationArea,
+            BorderLayout.CENTER);
 
         JButton nextButton =
             new JButton("Next");
 
-        add(
-            nextButton,
-            BorderLayout.SOUTH
-        );
+        add(nextButton,
+            BorderLayout.SOUTH);
+
+        nextButton.addActionListener(e -> {
+            onNext.run();
+        });
     }
 }

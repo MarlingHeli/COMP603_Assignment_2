@@ -8,31 +8,40 @@ package User_Interface.Graphical;
 import javax.swing.*;
 import java.awt.*;
 import User_Interface.Graphical.GUI;
+import Question.Question;
+import Model.QuizSession;
 
 public class QuizPanel extends JPanel {
 
-    public QuizPanel() {
+    private Question question;
+    private QuizSession quiz;
+    private GUI gui;
+
+    public QuizPanel(
+        Question question,
+        QuizSession quiz,
+        GUI gui
+    ) {
+        this.question = question;
+        this.quiz = quiz;
+        this.gui = gui;
 
         setLayout(new BorderLayout());
 
         JLabel questionLabel =
-            new JLabel("Question 1: What is Java?");
+            new JLabel(question.getQuestionText());
 
-        questionLabel.setFont(
-            new Font("Arial", Font.BOLD, 24)
-        );
+        String[] options =
+            question.getOptions();
 
-        add(questionLabel, BorderLayout.NORTH);
-
-        // Answers
         JRadioButton a =
-            new JRadioButton("A. A programming language");
+            new JRadioButton(options[0]);
 
         JRadioButton b =
-            new JRadioButton("B. A type of animal");
+            new JRadioButton(options[1]);
 
         JRadioButton c =
-            new JRadioButton("C. A country");
+            new JRadioButton(options[2]);
 
         ButtonGroup group =
             new ButtonGroup();
@@ -55,72 +64,68 @@ public class QuizPanel extends JPanel {
         answerPanel.add(b);
         answerPanel.add(c);
 
-        add(answerPanel,
-            BorderLayout.CENTER);
-
         JButton submitButton =
             new JButton("Submit");
 
+        add(questionLabel,
+            BorderLayout.NORTH);
+
+        add(answerPanel,
+            BorderLayout.CENTER);
+
         add(submitButton,
             BorderLayout.SOUTH);
-        
+
         submitButton.addActionListener(e -> {
 
-            boolean correct = true; // temporary test value
+            String selectedAnswer = null;
 
-            GUI gui = (GUI) SwingUtilities.getWindowAncestor(this);
+            if(a.isSelected())
+                selectedAnswer = a.getText();
+
+            else if(b.isSelected())
+                selectedAnswer = b.getText();
+
+            else if(c.isSelected())
+                selectedAnswer = c.getText();
+
+            if(selectedAnswer == null) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Please select an answer."
+                );
+                return;
+            }
+
+            boolean correct =
+                question.checkAnswer(
+                    selectedAnswer
+                );
+
+            if(correct) {
+                quiz.answerCorrect();
+            }
+            else {
+                quiz.answerWrong();
+            }
 
             gui.showResult(
                 correct,
-                1,
-                "This is the explanation."
-        );
-});
+                quiz,
+                question.getExplanation(),
+                () -> {
+                    if (quiz.getCurrentQuestionIndex()
+                        < quiz.getQuestions().size()) {
 
-//        ----------------------------------------
-        
-        JButton hintButton = new JButton("?");
-        
-        JPanel topPanel =
-            new JPanel(
-                new BorderLayout()
+                        gui.showQuiz(quiz);
+
+                    } else {
+
+                        gui.showEnd(quiz);
+                    }
+                }
             );
 
-        topPanel.add(
-            questionLabel,
-            BorderLayout.CENTER
-        );
-
-        topPanel.add(
-            hintButton,
-            BorderLayout.EAST
-        );
-
-        add(
-            topPanel,
-            BorderLayout.NORTH
-        );
-        
-        hintButton.addActionListener(e -> {
-
-        int choice =
-            JOptionPane.showConfirmDialog(
-                this,
-                "Ask Fluffy for a hint?",
-                "Hint",
-                JOptionPane.YES_NO_OPTION
-            );
-
-        if(choice ==
-            JOptionPane.YES_OPTION) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                "Remember inheritance!"
-            );
-        }
-    });
-        
-        
+        });
     }
 }

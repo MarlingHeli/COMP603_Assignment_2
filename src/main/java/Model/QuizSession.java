@@ -95,5 +95,12 @@ public class QuizSession {
         return "No trophy (lose)\n" + user.getPetName() + " says, \"Nice try! "
                 + "Do you think you can do better?\"";
     }
+    
+    public Question getCurrentQuestion() {
+        if (currentQuestionIndex < questions.size()) {
+            return questions.get(currentQuestionIndex);
+        }
+        return null;
+    }
 
 }
