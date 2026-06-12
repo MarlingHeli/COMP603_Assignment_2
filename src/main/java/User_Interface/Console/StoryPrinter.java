@@ -1,4 +1,6 @@
-package User_Interface;
+package User_Interface.Console;
+
+import User_Interface.UI;
 
 public class StoryPrinter {
 

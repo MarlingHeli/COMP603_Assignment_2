@@ -9,5 +9,9 @@ package Model;
  * @author hmarl
  */
 public interface ModelListener {
+    public void onExistingUser();
+    public void onNewUser();
+    public void onEnterAnswer();
+    public void onScoreUpdated();
     
 }

@@ -8,31 +8,100 @@ package Question;
  *
  * @author hmarl
  */
+import Persistence.DatabaseQuestions;
 import java.util.*;
 
 public class QuestionPool {
     //hashMap to keep track of question index and question object
     private Map<Integer, Question> questionPool;
-//    private Random random = new Random();
+    DatabaseQuestions databaseQuestion;
 
-    public QuestionPool() {
+    public QuestionPool(DatabaseQuestions databaseQuestion) {
         questionPool = new HashMap<>();
-        loadQuestions();
+        this.databaseQuestion = databaseQuestion;
+//        loadQuestions();
     }
 
     //return question pool if needed
     public Map<Integer, Question> getQuestionPool() {
         return questionPool;
     }
+    
+    
+    public List<Question> getRandomQuestions(
+    int numQuestions) {
 
-    // get random questions based on numQuestions size
-    public List<Question> getRandomQuestions(int numQuestions) {
-    List<Question> allQuestions = new ArrayList<>(questionPool.values());
-    //randomise question order
-    Collections.shuffle(allQuestions);
-    //get list of first numQuestions of questions
-    return allQuestions.subList(0, numQuestions);
+        List<Question> allQuestions =
+            new ArrayList<>(
+                questionPool.values()
+            );
+
+        Collections.shuffle(
+            allQuestions
+        );
+
+        return new ArrayList<>(
+            allQuestions.subList(
+                0,
+                numQuestions
+            )
+        );
     }
+    
+    public void loadQuestions(DatabaseQuestions databaseQuestions) {
+
+        questionPool.clear();
+
+        List<Question> questions =
+            databaseQuestions.getAllQuestions();
+
+        for (Question question : questions) {
+
+            questionPool.put(
+                question.getQuestionID(),
+                question
+            );
+        }
+    }
+    
+public List<Question> getQuestionsFromIDs(
+    String questionIDs
+) {
+
+        List<Question> questions =
+            new ArrayList<>();
+
+        String[] ids =
+            questionIDs.split(",");
+
+        for (String id : ids) {
+
+            Question question =
+                questionPool.get(
+                    Integer.parseInt(
+                        id.trim()
+                    )
+                );
+
+            if (question != null) {
+
+                questions.add(
+                    question
+                );
+            }
+        }
+
+        return questions;
+    }
+
+//    // get random questions based on numQuestions size
+//    public List<Question> getRandomQuestions(int numQuestions) {
+//    List<Question> allQuestions = new ArrayList<>(questionPool.values());
+//    //randomise question order
+//    Collections.shuffle(allQuestions);
+//    //get list of first numQuestions of questions
+//    return allQuestions.subList(0, numQuestions);
+//    }
 
     public Question getQuestionByID(int id) {
         return questionPool.get(id);

@@ -10,12 +10,12 @@ package Persistence;
  */
 
 import Model.User;
-import Model.QuizSession;
+//import Model.QuizSession;
 
 public interface UserRecord {
+    //separated UserRecord interface into UserRecord and QuizRecord
+    //for ISP for database
     void saveRecord(User user);
     User loadRecord(String username);
 
-    void saveGame(QuizSession session);
-    QuizSession loadGame(String username);
 }

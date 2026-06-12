@@ -60,40 +60,65 @@ public class QuizSession {
         return "You got " + numCorrectAnswers + "/" + questions.size() + " questions correct.";
     }
     
-//    //only save highest score in user's file
-//    public void saveHighestScore()
-//    {
-//        if (numCorrectAnswers > user.getHighScore())
-//        {
-//            user.setHighScore(numCorrectAnswers);
-//        }
-//    }
+    public String getTrophy() {
 
-    /**
-     * Determines trophy result
-     */
-    public String calculateResult() {
-        double percentage = (double) numCorrectAnswers / questions.size() * 100;
+        double percentage =
+            (double) numCorrectAnswers /
+            questions.size() * 100;
 
-        if (percentage >= 80)
-        {
-            return "Gold trophy\n" + user.getPetName() + " says: \"Congratulations! "
-                    + "Your wallet has been saved!\"";
+        if (percentage >= 80) {
+            return "GOLD";
         }
-        if (percentage >= 70)
-        {
-            return "Silver trophy\n" + user.getPetName() + " says, \"Congratulations! "
-                    + "Unfortunately, silver does not get a\nlifetime supply of petfood.\n"
-                    + "Do you think you can do better?\"";
+
+        if (percentage >= 70) {
+            return "SILVER";
         }
-        if (percentage >= 60)
-        {
-            return "Bronze trophy\n" + user.getPetName() + " says, \"Congratulations! "
-                    + "Unfortunately, bronze does not get a\nlifetime supply of petfood.\n"
-                    + "Do you think you can do better?\"";
+
+        if (percentage >= 60) {
+            return "BRONZE";
         }
-        return "No trophy (lose)\n" + user.getPetName() + " says, \"Nice try! "
-                + "Do you think you can do better?\"";
+
+        return "No Trophy...";
+    }
+    
+    public String getEndingDialogue() {
+
+        double percentage =
+            (double) numCorrectAnswers /
+            questions.size() * 100;
+
+        if (percentage >= 80) {
+            return user.getPetName()
+                + " says: Congratulations! "
+                + "Your wallet has been saved!";
+        }
+
+        if (percentage >= 70) {
+            return user.getPetName()
+                + " says: Unfortunately silver "
+                + "does not win pet food.";
+        }
+
+        if (percentage >= 60) {
+            return user.getPetName()
+                + " says: Bronze is good, "
+                + "but no pet food.";
+        }
+
+        return user.getPetName()
+            + " says: Nice try. "
+            + "Can you do better?";
+    }
+    
+    public Question getCurrentQuestion() {
+    
+        // Safety check so we don't go out of bounds
+        if (currentQuestionIndex >= questions.size()) {
+            return null;
+        }
+
+        // Return question at current index
+        return questions.get(currentQuestionIndex);
     }
 
 }

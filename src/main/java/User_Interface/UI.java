@@ -9,11 +9,18 @@ package User_Interface;
  * @author hmarl
  */
 
+import Model.QuizSession;
+
 public interface UI {
     void displayText(String text);
     void displayError(String text);
     String getUserInput(String prompt);
     void slowPrint(String text);
+    int showMenu ();
+    void printStory(String user, String pet, Runnable onFinish);
+    void showQuiz(QuizSession quiz, Runnable onFinish);
+    void showEnd(QuizSession quiz, Runnable onFinish);
+    
     
     
 }
