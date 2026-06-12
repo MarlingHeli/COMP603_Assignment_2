@@ -1,0 +1,3 @@
+username=;
+petName=;
+highScore=0
