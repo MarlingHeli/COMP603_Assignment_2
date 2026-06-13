@@ -67,18 +67,18 @@ public class QuizSession {
             questions.size() * 100;
 
         if (percentage >= 80) {
-            return "Gold";
+            return "GOLD";
         }
 
         if (percentage >= 70) {
-            return "Silver";
+            return "SILVER";
         }
 
         if (percentage >= 60) {
-            return "Bronze";
+            return "BRONZE";
         }
 
-        return "No Trophy";
+        return "No Trophy...";
     }
     
     public String getEndingDialogue() {
