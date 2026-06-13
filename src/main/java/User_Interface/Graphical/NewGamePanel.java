@@ -5,14 +5,16 @@ import javax.swing.*;
 import java.util.function.BiConsumer;
 import java.awt.*;
 
-public class NameInputPanel extends BackgroundPanel {
+public class NewGamePanel extends BackgroundPanel {
 
     private JTextField usernameField;
     private JTextField petField;
     private JCheckBox skipIntroBox;
     private JButton submitButton;
+    private JLabel username;
+    private JLabel petname;
 
-    public NameInputPanel(
+    public NewGamePanel(
             BiConsumer<User, Boolean> onSubmit
     ) {
         super("/Backgrounds/StartNewGameBg.png");
@@ -47,15 +49,25 @@ public class NameInputPanel extends BackgroundPanel {
         petField.setMaximumSize(
                 new Dimension(200,30)
         );
+        
+        username = new JLabel("Username");
+        petname = new JLabel("Pet name");
+        
+        usernameField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        petField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        skipIntroBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        username.setAlignmentX(Component.CENTER_ALIGNMENT);
+        petname.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         add(Box.createVerticalGlue());
 
-        add(new JLabel("Username"));
+        add(username);
         add(usernameField);
 
         add(Box.createVerticalStrut(20));
 
-        add(new JLabel("Pet Name"));
+        add(petname);
         add(petField);
 
         add(Box.createVerticalStrut(20));

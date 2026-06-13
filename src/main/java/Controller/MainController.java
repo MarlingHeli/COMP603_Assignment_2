@@ -2,15 +2,19 @@ package Controller;
 
 import Model.AppStateModel;
 import Model.GameState;
+import Model.QuizSession;
+import Model.User;
 import Persistence.DatabaseManager;
 import Persistence.DatabaseQuestions;
 import Persistence.DatabaseQuizSession;
 import Persistence.DatabaseUser;
+import Question.Question;
 import Question.QuestionPool;
 import User_Interface.Graphical.GUI;
 import User_Interface.UI;
 
 import java.sql.Connection;
+import java.util.List;
 
 public class MainController {
 
@@ -25,6 +29,8 @@ public class MainController {
 
     private AppStateModel appState;
     private GUI gui;
+    
+    private User user;
 
     public MainController() {
 
@@ -72,17 +78,33 @@ public class MainController {
         );
     }
 
-    public void startNewGame() {
+    public void startNewGame(String username, String petName) {
+        List<Question> questions =
+                questionPool.getRandomQuestions(10);
+
+        QuizSession quiz =
+                new QuizSession(
+                        0,
+                        questions,
+                        0,
+                        user
+                );
+
+        appState.setCurrentQuiz(quiz);
 
         appState.setState(
-            GameState.NAME_INPUT
+                GameState.QUIZ
         );
     }
 
     public void loadGame() {
+        QuizSession quiz =
+                databaseQuizSession.loadGame(user);
+
+        appState.setCurrentQuiz(quiz);
 
         appState.setState(
-            GameState.LOAD_GAME
+                GameState.QUIZ
         );
     }
 

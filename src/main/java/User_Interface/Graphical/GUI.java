@@ -3,6 +3,9 @@ package User_Interface.Graphical;
 import javax.swing.*;
 import java.awt.*;
 import Model.*;
+//import Question.Question;
+//import Question.QuestionPool;
+//import Model.QuizSession;
 
 public class GUI extends JFrame implements StateListener {
 
@@ -14,20 +17,22 @@ public class GUI extends JFrame implements StateListener {
 
         appState.addListener(this);
 
-        setTitle("Feed Me Java");
+        this.setTitle("Feed Me Java");
         setSize(900,700);
 
-        setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null);
 
-        setDefaultCloseOperation(
+        this.setDefaultCloseOperation(
                 JFrame.EXIT_ON_CLOSE
         );
+        //prevent window resizing
+        this.setResizable(false);
 
-        setLayout(
+        this.setLayout(
                 new BorderLayout()
         );
 
-        setVisible(true);
+        this.setVisible(true);
     }
 
     @Override
@@ -58,7 +63,7 @@ public class GUI extends JFrame implements StateListener {
             case NAME_INPUT -> {
 
                 add(
-                        new NameInputPanel(
+                        new NewGamePanel(
                                 (user, skip) -> {
 
                                     appState.setCurrentUser(
@@ -108,21 +113,41 @@ public class GUI extends JFrame implements StateListener {
 
             case QUIZ -> {
 
-                JPanel panel =
-                        new JPanel();
+                QuizSession quiz =
+                        appState.getCurrentQuiz();
 
-                panel.add(
-                        new JLabel(
-                                "QUIZ GOES HERE"
-                        )
-                );
+                if (quiz == null) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Quiz session missing."
+                    );
+
+                    appState.setState(
+                            GameState.MENU
+                    );
+
+                    return;
+                }
 
                 add(
-                        panel,
+                        new QuizPanel(
+                                quiz,
+                                () -> {
+                                    if (quiz.isFinished()) {
+                                        appState.setState(
+                                                GameState.END
+                                        );
+                                    } else {
+                                        appState.setState(
+                                                GameState.QUIZ
+                                        );
+                                    }
+                                }
+                        ),
                         BorderLayout.CENTER
                 );
             }
-
             case RESULTS -> {
 
                 JPanel panel =

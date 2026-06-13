@@ -17,7 +17,6 @@ public class User {
     public User(String username, String petName, int highScore) {
         this.username = username;
         this.petName = petName;
-        //TO DO: remove or use
         this.highScore = highScore;
     }
 

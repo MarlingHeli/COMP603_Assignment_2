@@ -1,72 +1,155 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
-
-/**
- *
- * @author hmarl
- */
 
 import Question.Question;
 import java.util.List;
 
+/**
+ * Stores the state of a single quiz session.
+ *
+ * Responsible for:
+ * - Tracking progress
+ * - Tracking score
+ * - Providing current question
+ * - Calculating final results
+ */
 public class QuizSession {
+
     private int currentQuestionIndex;
     private List<Question> questions;
     private int numCorrectAnswers;
     private User user;
 
-    public QuizSession(int currentQuestionIndex, List<Question> questions,
-                       int numCorrectAnswers, User user) 
-    {
+    public QuizSession(
+            int currentQuestionIndex,
+            List<Question> questions,
+            int numCorrectAnswers,
+            User user
+    ) {
         this.currentQuestionIndex = currentQuestionIndex;
         this.questions = questions;
         this.numCorrectAnswers = numCorrectAnswers;
         this.user = user;
     }
 
+    /**
+     * Returns current question index.
+     */
     public int getCurrentQuestionIndex() {
         return currentQuestionIndex;
     }
 
+    /**
+     * Returns all quiz questions.
+     */
     public List<Question> getQuestions() {
         return questions;
     }
 
+    /**
+     * Returns total number of correct answers.
+     */
     public int getNumCorrectAnswers() {
         return numCorrectAnswers;
     }
 
+    /**
+     * Returns associated user.
+     */
     public User getUser() {
         return user;
     }
 
+    /**
+     * Returns current question.
+     *
+     * Returns null when quiz is complete.
+     */
+    public Question getCurrentQuestion() {
+
+        if (isFinished()) {
+            return null;
+        }
+
+        return questions.get(currentQuestionIndex);
+    }
+
+    /**
+     * Returns true when all questions have been answered.
+     */
+    public boolean isFinished() {
+        return currentQuestionIndex >= questions.size();
+    }
+
+    /**
+     * Call when player answers correctly.
+     */
     public void answerCorrect() {
         numCorrectAnswers++;
         currentQuestionIndex++;
     }
 
+    /**
+     * Call when player answers incorrectly.
+     */
     public void answerWrong() {
         currentQuestionIndex++;
     }
-    
-//    public void incrementScore() {
-//        numCorrectAnswers++;
-//    }
-    
-    public String getScoreText() {
-        return "You got " + numCorrectAnswers + "/" + questions.size() + " questions correct.";
+
+    /**
+     * Advances without changing score.
+     *
+     * Useful if you later add skipped questions.
+     */
+    public void advanceQuestion() {
+        currentQuestionIndex++;
     }
-    
-    public String getTrophy() {
-        //prevent division by 0
-        if (questions.isEmpty())
-        {
-            return "[ERROR] Improper score calculation";
+
+    /**
+     * Returns total question count.
+     */
+    public int getTotalQuestions() {
+        return questions.size();
+    }
+
+    /**
+     * Returns score percentage.
+     */
+    public double getPercentage() {
+
+        if (questions.isEmpty()) {
+            return 0;
         }
-        double percentage = (double) numCorrectAnswers/questions.size() * 100;
+
+        return ((double) numCorrectAnswers
+                / questions.size())
+                * 100.0;
+    }
+
+    /**
+     * Updates user's highest score if needed.
+     */
+    public void updateHighScore() {
+        user.saveHighestScore(numCorrectAnswers);
+    }
+
+    /**
+     * Result text shown on ending screen.
+     */
+    public String getScoreText() {
+
+        return "You got "
+                + numCorrectAnswers
+                + "/"
+                + questions.size()
+                + " questions correct.";
+    }
+
+    /**
+     * Trophy earned.
+     */
+    public String getTrophy() {
+
+        double percentage = getPercentage();
 
         if (percentage >= 80) {
             return "GOLD";
@@ -80,50 +163,66 @@ public class QuizSession {
             return "BRONZE";
         }
 
-        return "No Trophy...";
+        return "NO TROPHY";
     }
-    
+
+    /**
+     * Ending dialogue.
+     */
     public String getEndingDialogue() {
-        //prevent division by 0
-        if (questions.isEmpty())
-        {
-            return "[ERROR] Improper ending";
-        }
-        
-        double percentage = (double) numCorrectAnswers/questions.size() * 100;
+
+        double percentage = getPercentage();
+
+        String pet = user.getPetName();
 
         if (percentage >= 80) {
-            return user.getPetName()
-                + " says: Congratulations! "
-                + "Your wallet has been saved!";
+
+            return pet
+                    + " says: Congratulations! "
+                    + "Your wallet has been saved!";
         }
 
         if (percentage >= 70) {
-            return user.getPetName()
-                + " says: Unfortunately silver "
-                + "does not win pet food.";
+
+            return pet
+                    + " says: Unfortunately silver "
+                    + "does not win pet food.";
         }
 
         if (percentage >= 60) {
-            return user.getPetName()
-                + " says: Bronze is good, "
-                + "but no pet food.";
+
+            return pet
+                    + " says: Bronze is good, "
+                    + "but no pet food.";
         }
 
-        return user.getPetName()
-            + " says: Nice try. "
-            + "Can you do better?";
+        return pet
+                + " says: Nice try. "
+                + "Can you do better?";
     }
-    
-    public Question getCurrentQuestion() {
-    
-        // Safety check so we don't go out of bounds
-        if (currentQuestionIndex >= questions.size()) {
-            return null;
+
+    /**
+     * Converts question list into a comma-separated
+     * string for storage in QUIZSESSION table.
+     *
+     * Example:
+     * 34,40,21,7,8,19,36,11,2,10
+     */
+    public String getQuestionIDString() {
+
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < questions.size(); i++) {
+
+            builder.append(
+                    questions.get(i).getQuestionID()
+            );
+
+            if (i < questions.size() - 1) {
+                builder.append(",");
+            }
         }
 
-        // Return question at current index
-        return questions.get(currentQuestionIndex);
+        return builder.toString();
     }
-
 }

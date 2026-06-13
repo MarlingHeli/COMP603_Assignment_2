@@ -5,6 +5,8 @@ import java.awt.*;
 
 public class MenuPanel
         extends BackgroundPanel {
+    
+    Image image;
 
     public MenuPanel(
         Runnable onStart,
@@ -23,6 +25,10 @@ public class MenuPanel
             )
         );
 
+        //add logo
+        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/Components/FeedMeJavaLogo.png"));
+        JLabel logoLabel = new JLabel(logoIcon);
+        
         JButton start =
             new JButton(
                 "Start New Game"
@@ -37,6 +43,7 @@ public class MenuPanel
             new JButton(
                 "Exit"
             );
+        logoLabel.setAlignmentX( Component.CENTER_ALIGNMENT);
 
         start.setAlignmentX(
             Component.CENTER_ALIGNMENT
@@ -63,7 +70,9 @@ public class MenuPanel
         );
 
         add(Box.createVerticalGlue());
-
+        
+        add(logoLabel);
+                
         add(start);
         add(Box.createVerticalStrut(20));
 

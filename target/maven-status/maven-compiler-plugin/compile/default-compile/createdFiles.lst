@@ -8,7 +8,6 @@ Model\GameState.class
 User_Interface\UI.class
 Question\QuestionFactory.class
 Question\Question.class
-User_Interface\Graphical\NameInputPanel.class
 User_Interface\Graphical\QuizPanel.class
 User_Interface\Graphical\IntroPanel.class
 Persistence\DatabaseQuizSession.class
@@ -27,6 +26,7 @@ Model\QuizSession.class
 Validation\InputValidator.class
 Question\MultiChoiceQuestion.class
 Model\AppStateModel.class
+User_Interface\Graphical\NewGamePanel.class
 Model\StateListener.class
 Persistence\UserRecord.class
 User_Interface\Graphical\ResultPanel.class
