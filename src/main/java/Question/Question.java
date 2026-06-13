@@ -15,7 +15,7 @@ public interface Question {
 
     String getExplanation();
 
-    String[] getOptions();
+//    String[] getOptions();
 
     boolean checkAnswer(String userAnswer);
 

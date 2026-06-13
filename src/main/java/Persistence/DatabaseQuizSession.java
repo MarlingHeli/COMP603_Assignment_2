@@ -12,7 +12,6 @@ package Persistence;
 import Model.QuizSession;
 import Model.User;
 import Question.Question;
-import Question.QuestionPool;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,14 +27,12 @@ public class DatabaseQuizSession
     extends DatabaseDAO
     implements QuizRecord {
 
-    List<Question> questions;
-    QuestionPool questionPool; 
     DatabaseQuestions databaseQuestion;
     
     public DatabaseQuizSession(Connection connection) {
         super(connection);
         databaseQuestion = new DatabaseQuestions(connection);
-        questionPool = new QuestionPool(databaseQuestion);
+        this.createTable();
     }
 
     @Override
@@ -231,7 +228,7 @@ public class DatabaseQuizSession
                         "QUESTIONS"
                     );
 
-                questions = questionPool.getQuestionsFromIDs(questionIDs);
+                List<Question> questions = databaseQuestion.getQuestionsFromIDs(questionIDs);
 
                 return new QuizSession(
                     currentQuestionIndex,
@@ -281,7 +278,6 @@ public class DatabaseQuizSession
         }
     }
 
-//    @Override
     public boolean usernameExists(String username) {
         
         String sql = """
@@ -297,7 +293,6 @@ public class DatabaseQuizSession
             return rs.next();
 
         } catch (SQLException ex) {
-//                    ex.printStackTrace();
             System.out.println("Failed to check username");
         }
 

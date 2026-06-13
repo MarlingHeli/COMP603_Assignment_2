@@ -4,10 +4,16 @@
  */
 package Persistence;
 
+import Question.MultiChoiceQuestion;
+import Question.Question;
+import Question.QuestionFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -15,10 +21,67 @@ import java.sql.Statement;
  */
 public class DatabaseQuestions extends DatabaseDAO{
     
+    QuestionFactory factory;
+            
     public DatabaseQuestions(Connection connection) {
         super(connection);
+        factory = new QuestionFactory();
         this.createTable();
-        
+    }
+    
+    public List<Question> getQuestionsFromIDs(String questionIDs) {
+
+        List<Question> questions = new ArrayList<>();
+
+        String[] ids = questionIDs.split(",");
+
+        for (String id : ids) {
+            Question question = getQuestionByID(Integer.parseInt(id.trim()));
+
+            if (question != null) {
+                questions.add(question);
+            }
+        }
+
+        return questions;
+    }
+    
+    public Question getQuestionByID(int id) {
+
+        String sql =
+            """
+            SELECT *
+            FROM QUESTIONS
+            WHERE ID = ?
+            """;
+
+        try (
+            PreparedStatement stmt =
+                connection.prepareStatement(sql)
+        ) {
+
+            stmt.setInt(1, id);
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+
+                return factory.createMultiChoiceQuestion(
+                    rs.getInt("ID"),
+                    rs.getString("QUESTIONTEXT"),
+                    rs.getString("ANSWER1"),
+                    rs.getString("ANSWER2"),
+                    rs.getString("ANSWER3"),
+                    rs.getInt("CORRECTANSWER"),
+                    rs.getString("EXPLANATION")
+                );
+            }
+        }
+        catch (SQLException ex) {
+            System.out.println("Failed to load question");
+        }
+
+        return null;
     }
     
     @Override
@@ -30,14 +93,13 @@ public class DatabaseQuestions extends DatabaseDAO{
             CREATE TABLE QUESTIONS
             (
                 ID INT NOT NULL GENERATED ALWAYS AS IDENTITY
-                    (START WITH 0, INCREMENT BY 1),
+                    (START WITH 1, INCREMENT BY 1) PRIMARY KEY,
                 QUESTIONTEXT VARCHAR(1000),
                 ANSWER1 VARCHAR(500),
                 ANSWER2 VARCHAR(500),
                 ANSWER3 VARCHAR(500),
                 CORRECTANSWER INT,
                 EXPLANATION VARCHAR(5000)
-                PRIMARY KEY (ID),
             )
             """;
 
@@ -58,6 +120,44 @@ public class DatabaseQuestions extends DatabaseDAO{
         }
     }
     
+    public List<Question> getQuestions() {
+
+        List<Question> questions = new ArrayList<>();
+
+        String sql =
+            """
+            SELECT *
+            FROM QUESTIONS
+            ORDER BY ID
+            """;
+
+        try (
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql)
+        ) {
+
+            while (rs.next()) {
+
+                Question question = factory.createMultiChoiceQuestion(
+                    rs.getInt("ID"),
+                    rs.getString("QUESTIONTEXT"),
+                    rs.getString("ANSWER1"),
+                    rs.getString("ANSWER2"),
+                    rs.getString("ANSWER3"),
+                    rs.getInt("CORRECTANSWER"),
+                    rs.getString("EXPLANATION")
+                );
+
+                questions.add(question);
+            }
+        }
+        catch (SQLException ex) {
+            System.out.println("Failed to load questions");
+        }
+
+        return questions;
+    }
+    
     public void addQuestions() {
 
         String sql =
@@ -71,7 +171,7 @@ public class DatabaseQuestions extends DatabaseDAO{
                 CORRECTANSWER,
                 EXPLANATION
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {

@@ -24,6 +24,7 @@ public class DatabaseUser extends DatabaseDAO implements UserRecord {
     //use same connection
     public DatabaseUser(Connection connection) {
         super(connection);
+        this.createTable();
     }
 
     @Override
@@ -33,7 +34,8 @@ public class DatabaseUser extends DatabaseDAO implements UserRecord {
             CREATE TABLE PLAYERS
             (
                 USERNAME VARCHAR(30) PRIMARY KEY,
-                PETNAME VARCHAR(30)
+                PETNAME VARCHAR(30),
+                HIGHSCORE INT
             )
             """;
 

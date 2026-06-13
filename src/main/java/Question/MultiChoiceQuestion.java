@@ -2,24 +2,23 @@ package Question;
 
 public class MultiChoiceQuestion implements Question {
 
-    private String questionText;
-    private String explanation;
-    private String[] options;
-    private int answer;
     private int id;
+    private String questionText;
+    private String answer1;
+    private String answer2;
+    private String answer3;
+    private int correctAnswer;
+    private String explanation;
 
-    public MultiChoiceQuestion(
-        String questionText,
-        String[] options,
-        String explanation,
-        int answer,
-        int id
-    ) {
-        this.questionText = questionText;
-        this.options = options;
-        this.explanation = explanation;
-        this.answer = answer;
+    public MultiChoiceQuestion(int id, String questionText, String answer1, 
+            String answer2, String answer3, int correctAnswer, String explanation) {
         this.id = id;
+        this.questionText = questionText;
+        this.answer1 = answer1;
+        this.answer2 = answer2;
+        this.answer3 = answer3;
+        this.correctAnswer = correctAnswer;
+        this.explanation = explanation;
     }
 
     @Override
@@ -36,7 +35,7 @@ public class MultiChoiceQuestion implements Question {
     public boolean checkAnswer(String userAnswer) {
         try {
             int choice = Integer.parseInt(userAnswer.trim());
-            return choice == answer;
+            return choice == correctAnswer;
         } catch (NumberFormatException e) {
             return false;
         }
@@ -46,9 +45,19 @@ public class MultiChoiceQuestion implements Question {
     public int getQuestionID() {
         return id;
     }
-
-    @Override
-    public String[] getOptions() {
-        return options;
+    
+    public String getAnswer1()
+    {
+        return answer1;
+    }
+    
+    public String getAnswer2()
+    {
+        return answer2;
+    }
+    
+    public String getAnswer3()
+    {
+        return answer3;
     }
 }
