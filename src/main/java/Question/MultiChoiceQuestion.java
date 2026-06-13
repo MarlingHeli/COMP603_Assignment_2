@@ -46,18 +46,8 @@ public class MultiChoiceQuestion implements Question {
         return id;
     }
     
-    public String getAnswer1()
+    public String[] getOptions()
     {
-        return answer1;
-    }
-    
-    public String getAnswer2()
-    {
-        return answer2;
-    }
-    
-    public String getAnswer3()
-    {
-        return answer3;
+        return new String[] {answer1, answer2, answer3};
     }
 }

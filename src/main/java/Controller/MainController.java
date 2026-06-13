@@ -2,12 +2,15 @@ package Controller;
 
 import Model.QuizSession;
 import Model.User;
+
 import Persistence.DatabaseManager;
 import Persistence.DatabaseQuestions;
 import Persistence.DatabaseQuizSession;
 import Persistence.DatabaseUser;
+
 import Question.Question;
 import Question.QuestionPool;
+
 import User_Interface.Graphical.GUI;
 import User_Interface.UI;
 
@@ -20,10 +23,11 @@ public class MainController {
 
     private UI ui;
 
+    private DatabaseManager databaseManager;
     private DatabaseUser databaseUser;
     private DatabaseQuizSession databaseQuizSession;
-    private DatabaseManager databaseManager;
     private DatabaseQuestions databaseQuestions;
+
     private QuestionPool questionPool;
 
     private QuizSession quiz;
@@ -34,16 +38,24 @@ public class MainController {
         GUI gui = new GUI();
         gui.setVisible(true);
         ui = gui;
-        
-        
 
-        Connection connection = databaseManager.getConnection();
+        databaseManager =
+            new DatabaseManager();
 
-        databaseUser = new DatabaseUser(connection);
-        databaseQuestions = new DatabaseQuestions(connection);
-        databaseQuizSession = new DatabaseQuizSession(connection);
+        Connection connection =
+            databaseManager.getConnection();
 
-        questionPool = new QuestionPool(databaseQuestions);
+        databaseUser =
+            new DatabaseUser(connection);
+
+        databaseQuestions =
+            new DatabaseQuestions(connection);
+
+        databaseQuizSession =
+            new DatabaseQuizSession(connection);
+
+        questionPool =
+            new QuestionPool(databaseQuestions);
     }
 
     public static void main(String[] args) {
@@ -56,75 +68,76 @@ public class MainController {
 
     private void showMenu() {
 
-        while (true) {
+        int choice =
+            ui.showMenu();
 
-            int choice = ui.showMenu();
+        switch (choice) {
 
-            switch (choice) {
+            case 1 ->
+                startNewGame();
 
-                case 1 -> {
-                    startNewGame();
-                    return;
-                }
+            case 2 ->
+                loadGame();
 
-                case 2 -> {
-                    loadGame();
-                    return;
-                }
+            case 3 ->
+                exit();
 
-                case 3 -> exit();
-
-                default ->
-                    ui.displayError(
-                        "Invalid option"
-                    );
+            default -> {
+                ui.displayError(
+                    "Invalid option"
+                );
+//                showMenu();
             }
         }
     }
 
     private void startNewGame() {
 
-        User inputUser =
-            ui.inputNames();
+        ui.inputNames(inputUser -> {
 
-        User existing =
-            databaseUser.loadRecord(
-                inputUser.getUsername()
+            User existing =
+                databaseUser.loadRecord(
+                    inputUser.getUsername()
+                );
+
+            if (existing != null) {
+
+                existing.setPetName(
+                    inputUser.getPetName()
+                );
+
+                user = existing;
+
+            } else {
+
+                user = inputUser;
+            }
+
+            List<Question> questions =
+                questionPool.getRandomQuestions(
+                    NUM_QUESTIONS
+                );
+
+            quiz = new QuizSession(
+                0,
+                questions,
+                0,
+                user
             );
 
-        if (existing != null) {
+            ui.printStory(
+                user.getUsername(),
+                user.getPetName(),
+                () -> {
 
-            existing.setPetName(
-                inputUser.getPetName()
+                    ui.showQuiz(
+                        quiz,
+                        () -> finishQuiz()
+                    );
+
+                }
             );
-
-            user = existing;
-
-        } else {
-
-            user = inputUser;
-        }
-
-        List<Question> questions =
-            questionPool.getRandomQuestions(
-                NUM_QUESTIONS
-            );
-
-        quiz = new QuizSession(
-            0,
-            questions,
-            0,
-            user
-        );
-
-        ui.printStory(
-            user.getUsername(),
-            user.getPetName(),
-            () -> ui.showQuiz(
-                quiz,
-                this::finishQuiz
-            )
-        );
+        });
     }
 
     private void loadGame() {
@@ -162,19 +175,22 @@ public class MainController {
 
         ui.showQuiz(
             quiz,
-            this::finishQuiz
+            () -> finishQuiz()
         );
     }
 
     private void finishQuiz() {
 
-        user = quiz.getUser();
+        user =
+            quiz.getUser();
 
         user.saveHighestScore(
             quiz.getNumCorrectAnswers()
         );
 
-        databaseUser.saveRecord(user);
+        databaseUser.saveRecord(
+            user
+        );
 
         databaseQuizSession.saveGame(
             quiz
@@ -182,7 +198,7 @@ public class MainController {
 
         ui.showEnd(
             quiz,
-            this::start
+            () -> start()
         );
     }
 
