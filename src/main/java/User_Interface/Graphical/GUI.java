@@ -2,6 +2,7 @@ package User_Interface.Graphical;
 
 import Model.QuizSession;
 import Question.Question;
+import Model.User;
 import User_Interface.Graphical.QuizPanel;
 import Validation.InputValidator;
 import User_Interface.UI;
@@ -10,6 +11,7 @@ import java.awt.Component;
 import javax.swing.*;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.util.function.Consumer;
 
 public class GUI extends JFrame implements UI {
 
@@ -56,7 +58,7 @@ public class GUI extends JFrame implements UI {
         dialog.setSize(900, 700);
         dialog.setLocationRelativeTo(null);
         
-        JPanel panel = new BackgroundPanel("/FeedMeJavaBg.png");
+        JPanel panel = new BackgroundPanel("Backgrounds/MenuBgWithLogo.png.png");
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         JButton startButton = new JButton("Start New Game");
@@ -260,6 +262,52 @@ public class GUI extends JFrame implements UI {
 
         revalidate();
         repaint();
+    }
+    
+    @Override
+    public void inputNames(Consumer<User> onSubmit) {
+        getContentPane().removeAll();
+
+        NameInputPanel panel =
+            new NameInputPanel(onSubmit);
+
+        add(panel);
+        revalidate();
+        repaint();
+    }    
+    
+    @Override
+    public String inputLoadName() {
+
+        final String[] result = new String[1];
+
+        getContentPane().removeAll();
+
+        LoadPanel panel = new LoadPanel(username -> {
+            result[0] = username;
+
+            synchronized (result) {
+                result.notify();
+            }
+        });
+
+        add(panel);
+
+        revalidate();
+        repaint();
+
+        synchronized (result) {
+            while (result[0] == null) {
+                try {
+                    result.wait();
+                }
+                catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        return result[0];
     }
     
 }
