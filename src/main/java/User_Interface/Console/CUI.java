@@ -14,7 +14,7 @@ import java.util.Scanner;
 import Model.QuizSession;
 import Question.Question;
 import Model.User;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class CUI implements UI {
     private Scanner scanner = new Scanner(System.in);
@@ -169,5 +169,24 @@ public class CUI implements UI {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+    }
+    
+    @Override
+    public void inputNames(Consumer<User> onSubmit) {
+        String username =
+            getUserInput("Enter username: ");
+
+        String petName =
+            getUserInput("Enter pet name: ");
+
+        User user =
+            new User(username, petName, 0);
+
+        onSubmit.accept(user);
+    }
+    
+    @Override
+    public String inputLoadName() {
+        return getUserInput("Enter username: ");
     }
 }

@@ -1,22 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package User_Interface.Graphical;
 
 import javax.swing.*;
 import java.awt.*;
-import User_Interface.Graphical.GUI;
-import Question.Question;
 import Model.QuizSession;
+import Question.Question;
 
-public class QuizPanel extends JPanel {
+public class QuizPanel extends BackgroundPanel {
 
-    private Question question;
-    private QuizSession quiz;
-    private GUI gui;
-    private Runnable onFinish;
+    private JButton submitButton;
+    private JRadioButton option1;
+    private JRadioButton option2;
+    private JRadioButton option3;
 
     public QuizPanel(
         Question question,
@@ -24,87 +18,96 @@ public class QuizPanel extends JPanel {
         GUI gui,
         Runnable onFinish
     ) {
-        this.question = question;
-        this.quiz = quiz;
-        this.gui = gui;
 
-        setLayout(new BorderLayout());
+        super("resources/Backgrounds/QuizBg.png");
+
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JLabel questionLabel =
-            new JLabel(question.getQuestionText());
+            new JLabel(
+                "<html>"
+                + question.getQuestionText()
+                + "</html>"
+            );
+
+        questionLabel.setAlignmentX(
+            Component.CENTER_ALIGNMENT
+        );
 
         String[] options =
             question.getOptions();
 
-        JRadioButton a =
+        option1 =
             new JRadioButton(options[0]);
 
-        JRadioButton b =
+        option2 =
             new JRadioButton(options[1]);
 
-        JRadioButton c =
+        option3 =
             new JRadioButton(options[2]);
+
+        // make radio buttons transparent
+        option1.setOpaque(false);
+        option2.setOpaque(false);
+        option3.setOpaque(false);
 
         ButtonGroup group =
             new ButtonGroup();
 
-        group.add(a);
-        group.add(b);
-        group.add(c);
+        group.add(option1);
+        group.add(option2);
+        group.add(option3);
 
-        JPanel answerPanel =
-            new JPanel();
-
-        answerPanel.setLayout(
-            new BoxLayout(
-                answerPanel,
-                BoxLayout.Y_AXIS
-            )
-        );
-
-        answerPanel.add(a);
-        answerPanel.add(b);
-        answerPanel.add(c);
-
-        JButton submitButton =
+        submitButton =
             new JButton("Submit");
 
-        add(questionLabel,
-            BorderLayout.NORTH);
+        submitButton.setAlignmentX(
+            Component.CENTER_ALIGNMENT
+        );
 
-        add(answerPanel,
-            BorderLayout.CENTER);
+        add(Box.createVerticalGlue());
 
-        add(submitButton,
-            BorderLayout.SOUTH);
+        add(questionLabel);
+
+        add(Box.createVerticalStrut(30));
+
+        add(option1);
+        add(option2);
+        add(option3);
+
+        add(Box.createVerticalStrut(20));
+
+        add(submitButton);
+
+        add(Box.createVerticalGlue());
 
         submitButton.addActionListener(e -> {
 
-            String selectedAnswer = null;
+            int answer = -1;
 
-            if(a.isSelected())
-                selectedAnswer = a.getText();
+            if (option1.isSelected())
+                answer = 1;
 
-            else if(b.isSelected())
-                selectedAnswer = b.getText();
+            else if (option2.isSelected())
+                answer = 2;
 
-            else if(c.isSelected())
-                selectedAnswer = c.getText();
+            else if (option3.isSelected())
+                answer = 3;
 
-            if(selectedAnswer == null) {
+            if (answer == -1) {
                 JOptionPane.showMessageDialog(
                     this,
-                    "Please select an answer."
+                    "Choose an answer."
                 );
                 return;
             }
 
             boolean correct =
                 question.checkAnswer(
-                    selectedAnswer
+                    String.valueOf(answer)
                 );
 
-            if(correct) {
+            if (correct) {
                 quiz.answerCorrect();
             }
             else {
@@ -115,19 +118,8 @@ public class QuizPanel extends JPanel {
                 correct,
                 quiz,
                 question.getExplanation(),
-                () -> {
-                    if (quiz.getCurrentQuestionIndex()
-                        < quiz.getQuestions().size()) {
-
-                        gui.showQuiz(quiz, onFinish);
-
-                    }
-                    else {
-                        onFinish.run();
-                    }
-                }
+                onFinish
             );
-
         });
     }
 }

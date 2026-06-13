@@ -12,7 +12,6 @@ package Controller;
 import User_Interface.Graphical.GUI;
 //import User_Interface.Console.CUI;
 import User_Interface.UI;
-//import User_Interface.Console.Menu;
 import User_Interface.Console.InputHelper;
 import User_Interface.Console.StoryPrinter;
 import Question.Question;
@@ -25,32 +24,27 @@ import Model.QuizSession;
 import java.util.List;
 
 public class MainController {
-    //added variable to easily adjust question size
-    //note: only applies to new games. old games based off size of question id list
+
     int numQuestions = 10;
-            
+
     private UI ui;
-    //private Menu menu;
     private UserRecord userRecord;
     private QuestionPool questionPool;
     private QuizSession quiz;
     private User user;
     private InputHelper inHelp;
 
-    //define objects in constructor
     public MainController() {
+
         GUI gui = new GUI();
         gui.setVisible(true);
-
         ui = gui;
-        
-        //ui = new CUI();
-        //pass on ui object to be used in menu
-        //menu = new Menu(ui);
+
+        // ui = new CUI();
+
         userRecord = new UserRecordFileIO();
         questionPool = new QuestionPool();
-        
-        // I will eventually get rid of this:
+
         inHelp = new InputHelper();
     }
 
@@ -58,108 +52,158 @@ public class MainController {
         new MainController().start();
     }
 
-    //display menu, will loop until user exits
     public void start() {
+        showMenu();
+    }
+
+    private void showMenu() {
+
         while (true) {
+
             int choice = ui.showMenu();
 
             switch (choice) {
-                case 1 -> { startNewGame();
-                            return;
-                        }
-                case 2 -> loadGame();
+
+                case 1 -> {
+                    startNewGame();
+                    return;
+                }
+
+                case 2 -> {
+                    loadGame();
+                    return;
+                }
+
                 case 3 -> exit();
-                //menu returns -1 if invalid input
-                default -> ui.displayError("Invalid option.");
+
+                default ->
+                    ui.displayError(
+                        "Invalid option"
+                    );
             }
         }
     }
 
     public void startNewGame() {
-        String username = ui.getUserInput("Enter username: ");
-        String petName = ui.getUserInput("Enter pet name: ");
-        
-        //keep existing highScore if user file already exists
-        user = userRecord.loadRecord(username);
-        //create new user if user file does not exist
-        if (user == null) {
-            user = new User(username, petName, 0);
-        }
-        
-//      update petName in case users have existing file but want to start
-//      new game and change pet name
-        user.setPetName(petName);
-        System.out.println("1. Before printStory");
 
-        List<Question> questions = questionPool.getRandomQuestions(numQuestions);   
-        
+        User inputUser =
+            ui.inputNames();
+
+        User existing =
+            userRecord.loadRecord(
+                inputUser.getUsername()
+            );
+
+        if (existing != null) {
+
+            existing.setPetName(
+                inputUser.getPetName()
+            );
+
+            user = existing;
+        }
+
+        else {
+            user = inputUser;
+        }
+
+        List<Question> questions =
+            questionPool.getRandomQuestions(
+                numQuestions
+            );
+
         quiz = new QuizSession(
             0,
             questions,
             0,
             user
         );
-        
+
         ui.printStory(
-            username,
-            petName,
+            user.getUsername(),
+            user.getPetName(),
+
             () -> ui.showQuiz(
                 quiz,
                 () -> finishQuiz()
-    )
-);
-
-
+            )
+        );
     }
-    
 
     public void loadGame() {
-        String username = ui.getUserInput("Enter username: ");
-        //attempt to load save file
-        user = userRecord.loadRecord(username);
-        quiz = userRecord.loadGame(username);
-        //return if no save file found corresponding to user
-        if (quiz == null || user == null) {
-            ui.displayError("No saved game found.\n");
+        String username =
+            ui.inputLoadName();
+
+        user =
+            userRecord.loadRecord(
+                username
+            );
+
+        if (user == null) {
+            ui.displayError(
+                "No saved game found."
+            );
             return;
         }
-        
-        ui.displayText("Saved File Found!!");
-        ui.slowPrint("Returning where you left off...\n");
-        
+
+        quiz =
+            userRecord.loadGame(
+                user
+            );
+
+        if (quiz == null) {
+            ui.displayError(
+                "No saved game found."
+            );
+            return;
+        }
+
         ui.showQuiz(
             quiz,
             () -> finishQuiz()
         );
-        
     }
 
-
     private void finishQuiz() {
-        // Save highest score
+        if (user == null) {
+            user = quiz.getUser();
+        }
+
         user.saveHighestScore(
             quiz.getNumCorrectAnswers()
         );
 
-        // Save user + game
         userRecord.saveRecord(user);
         userRecord.saveGame(quiz);
 
-        // Let UI display ending screen
-        ui.showEnd(quiz, () -> start());
+        ui.showEnd(
+            quiz,
+            () -> start()
+        );
     }
 
+
     private void handleExitDuringGame() {
- 
-        String save = inHelp.getYesNo(ui, "Save progress? (y/n): ");
+
+        String save =
+            inHelp.getYesNo(
+                ui,
+                "Save progress? (y/n): "
+            );
+
         if (save.equalsIgnoreCase("y")) {
+
             userRecord.saveRecord(user);
             userRecord.saveGame(quiz);
         }
     }
 
     public void exit() {
-        ui.displayText("Thanks for playing!");
+
+        ui.displayText(
+            "Thanks for playing!"
+        );
+
         System.exit(0);
     }
 }
