@@ -7,6 +7,8 @@ import User_Interface.Graphical.GUI;
 import javax.swing.JOptionPane;
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 public class MainController {
  private DatabaseManager databaseManager;
  private DatabaseUser databaseUser;
@@ -80,8 +82,26 @@ public class MainController {
  }
  public void completeQuiz() {
  QuizSession quiz = appState.getCurrentQuiz();
- if (quiz != null) { quiz.updateHighScore(); }
+ if (quiz != null) {
+ // Ask the player explicitly if they want to update and save their score values to high score tracking
+ int saveScoreChoice = JOptionPane.showConfirmDialog(gui, 
+ "Congratulations on finishing! Would you like to save your final quiz score to the leaderboard database?", 
+ "Save Score", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+ if (saveScoreChoice == JOptionPane.YES_OPTION) {
+ quiz.updateHighScore();
+ databaseUser.saveRecord(user);
+ // Cleanly delete active saved state history upon completion to avoid loaded resume loop exceptions
+ databaseQuizSession.deleteSession(user.getUsername());
+ }
+ }
  appState.setState(GameState.END);
+ }
+ public void showLeaderboard() {
+ appState.setState(GameState.LEADERBOARD);
+ }
+ // Intercepts database mappings and forwards parsed map values to UI panels
+ public HashMap<String, Integer> fetchLeaderboardScores() {
+ return databaseManager.getHighScores();
  }
  public void loadGame() {
  appState.setState(GameState.LOAD_SCREEN);
@@ -98,7 +118,6 @@ public class MainController {
  appState.setCurrentQuiz(restoredQuiz);
  appState.setState(GameState.QUIZ);
  }
- // FIXED: Switched method call from saveRecord to saveGame to match DatabaseQuizSession
  public void saveAndExit() {
  QuizSession currentSession = appState.getCurrentQuiz();
  if (currentSession != null && user != null) {

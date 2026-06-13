@@ -6,6 +6,7 @@ public enum GameState {
     INTRO,
     QUIZ,
     RESULT,
-    LOAD_SCREEN, // Tracks intermediate username checking and save selection screens
+    LOAD_SCREEN,
+    LEADERBOARD, // Tracks leaderboard view transition stages
     END
 }

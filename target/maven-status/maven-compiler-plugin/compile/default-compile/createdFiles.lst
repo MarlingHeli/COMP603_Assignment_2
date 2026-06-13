@@ -18,6 +18,7 @@ Persistence\UserRecordFileIO.class
 User_Interface\Console\InputHelper.class
 User_Interface\Console\CUI.class
 Controller\MainController.class
+User_Interface\Graphical\LeaderboardPanel.class
 User_Interface\Console\StoryPrinter.class
 Persistence\DatabaseDAO.class
 User_Interface\Graphical\MenuPanel.class

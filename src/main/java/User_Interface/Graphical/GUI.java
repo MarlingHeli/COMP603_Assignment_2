@@ -18,6 +18,7 @@ public class GUI extends JFrame implements StateListener {
  private QuizPanel quizPanel;
  private ResultPanel resultPanel;
  private LoadPanel loadPanel;
+ private LeaderboardPanel leaderboardPanel;
  private EndPanel endPanel;
  public GUI(AppStateModel appState, MainController controller) {
  this.appState = appState;
@@ -25,11 +26,11 @@ public class GUI extends JFrame implements StateListener {
  this.cardLayout = new CardLayout();
  this.container = new JPanel(cardLayout);
  setTitle("Feed Me Java");
- // 1. CRITICAL: Strictly forbid the operating system from closing the window automatically
  setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
  setSize(800, 600);
  setLocationRelativeTo(null);
- // 2. Add an explicit WindowListener to catch the exact moment the top-right "X" is clicked
+ // FIXED: Lock the program window dimensions so users cannot stretch or resize any screen
+ setResizable(false);
  addWindowListener(new WindowAdapter() {
  @Override
  public void windowClosing(WindowEvent e) {
@@ -42,6 +43,7 @@ public class GUI extends JFrame implements StateListener {
  quizPanel = new QuizPanel(controller, appState);
  resultPanel = new ResultPanel(controller, appState);
  loadPanel = new LoadPanel(controller);
+ leaderboardPanel = new LeaderboardPanel(controller);
  endPanel = new EndPanel(controller, appState);
  container.add(menuPanel, GameState.MENU.name());
  container.add(newGamePanel, GameState.NAME_INPUT.name());
@@ -49,36 +51,22 @@ public class GUI extends JFrame implements StateListener {
  container.add(quizPanel, GameState.QUIZ.name());
  container.add(resultPanel, GameState.RESULT.name());
  container.add(loadPanel, GameState.LOAD_SCREEN.name());
+ container.add(leaderboardPanel, GameState.LEADERBOARD.name());
  container.add(endPanel, GameState.END.name());
  add(container);
  setVisible(true);
  }
- // 3. Intercepts the window close action and forces the interactive choice prompt if in-game
  private void handleWindowCloseRequest() {
  GameState currentState = appState.getState();
- // Check if the player is currently sitting in either the live quiz card or the results card view
  if (currentState == GameState.QUIZ || currentState == GameState.RESULT) {
  String[] options = {"Save & Exit", "Exit Without Saving", "Cancel"};
  int choice = JOptionPane.showOptionDialog(
- this,
- "Would you like to save your current quiz progression before exiting?",
- "Exit Game",
- JOptionPane.YES_NO_CANCEL_OPTION,
- JOptionPane.QUESTION_MESSAGE,
- null,
- options,
- options
+ this, "Would you like to save your current quiz progression before exiting?", "Exit Game",
+ JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options
  );
- if (choice == 0) {
- // Player selected "Save & Exit" -> Persist data and shut down
- controller.saveAndExit();
- } else if (choice == 1) {
- // Player selected "Exit Without Saving" -> Shut down immediately
- controller.exit();
- }
- // If choice is 2 (Cancel) or the popup dialog itself is closed out, simply return to the game loop
+ if (choice == 0) { controller.saveAndExit(); } 
+ else if (choice == 1) { controller.exit(); }
  } else {
- // If the player is on any secondary screen (Menu, Input forms, End game board), close gracefully directly
  controller.exit();
  }
  }
@@ -90,6 +78,8 @@ public class GUI extends JFrame implements StateListener {
  resultPanel.refreshFeedback();
  } else if (state == GameState.LOAD_SCREEN) {
  loadPanel.resetToUserLookup();
+ } else if (state == GameState.LEADERBOARD) {
+ leaderboardPanel.refreshLeaderboard();
  } else if (state == GameState.END) {
  endPanel.refreshResults();
  }
