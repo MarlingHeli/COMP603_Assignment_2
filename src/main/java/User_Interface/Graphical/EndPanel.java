@@ -1,13 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package User_Interface.Graphical;
-
-/**
- *
- * @author 2
- */
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,22 +8,14 @@ public class EndPanel extends JPanel {
 
     public EndPanel(
         QuizSession quiz,
-        GUI gui,
-        Runnable onFinish
+        Runnable onMenu,
+        Runnable onExit
     ) {
 
-        setLayout(
-            new BorderLayout()
-        );
-
-        /*
-        Trophy title
-        */
+        setLayout(new BorderLayout());
 
         JLabel trophyLabel =
-            new JLabel(
-                quiz.getTrophy()
-            );
+            new JLabel(quiz.getTrophy());
 
         trophyLabel.setFont(
             new Font(
@@ -46,10 +29,6 @@ public class EndPanel extends JPanel {
             SwingConstants.CENTER
         );
 
-        /*
-        Score
-        */
-
         JLabel scoreLabel =
             new JLabel(
                 quiz.getScoreText()
@@ -59,10 +38,6 @@ public class EndPanel extends JPanel {
             SwingConstants.CENTER
         );
 
-        /*
-        Dialogue
-        */
-
         JLabel dialogueLabel =
             new JLabel(
                 quiz.getEndingDialogue()
@@ -71,10 +46,6 @@ public class EndPanel extends JPanel {
         dialogueLabel.setHorizontalAlignment(
             SwingConstants.CENTER
         );
-
-        /*
-        Buttons
-        */
 
         JButton menuButton =
             new JButton(
@@ -92,10 +63,6 @@ public class EndPanel extends JPanel {
         buttonPanel.add(menuButton);
         buttonPanel.add(exitButton);
 
-        /*
-        Layout
-        */
-
         JPanel centerPanel =
             new JPanel();
 
@@ -106,17 +73,9 @@ public class EndPanel extends JPanel {
             )
         );
 
-        centerPanel.add(
-            trophyLabel
-        );
-
-        centerPanel.add(
-            scoreLabel
-        );
-
-        centerPanel.add(
-            dialogueLabel
-        );
+        centerPanel.add(trophyLabel);
+        centerPanel.add(scoreLabel);
+        centerPanel.add(dialogueLabel);
 
         add(
             centerPanel,
@@ -129,19 +88,15 @@ public class EndPanel extends JPanel {
         );
 
         /*
-        Actions
+         Actions
         */
 
         menuButton.addActionListener(
-            e -> {
-                gui.showMenu();
-            }
+            e -> onMenu.run()
         );
 
         exitButton.addActionListener(
-            e -> {
-                System.exit(0);
-            }
+            e -> onExit.run()
         );
     }
 }

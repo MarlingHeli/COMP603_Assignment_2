@@ -1,313 +1,136 @@
 package User_Interface.Graphical;
 
-import Model.QuizSession;
-import Question.Question;
-import Model.User;
-import User_Interface.Graphical.QuizPanel;
-import Validation.InputValidator;
-import User_Interface.UI;
-import java.awt.BorderLayout;
-import java.awt.Component;
 import javax.swing.*;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.util.function.Consumer;
+import java.awt.*;
 
-public class GUI extends JFrame implements UI {
+import Model.AppStateModel;
+import Model.StateListener;
+import Model.GameState;
 
-    protected JTextArea mainTextArea;
-    protected JTextField errorField;
-    protected JTextField inputField;
-    protected JButton submitButton;
+public class GUI extends JFrame implements StateListener {
 
-    public GUI() {
+    private final AppStateModel appState;
+
+    /*
+        Constructor
+    */
+    public GUI(AppStateModel appState) {
+
+        this.appState = appState;
+
+        // register observer
+        appState.addListener(this);
 
         setTitle("Feed Me Java!");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 700);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        mainTextArea = new JTextArea();
-        errorField = new JTextField();
-        inputField = new JTextField(20);
-        submitButton = new JButton("Submit");
-
-        JPanel bottomPanel = new JPanel();
-
-        bottomPanel.add(inputField);
-        bottomPanel.add(submitButton);
-
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        errorField.setEditable(false);
-
+        // use one central layout
         setLayout(new BorderLayout());
 
-        add(mainTextArea, BorderLayout.CENTER);
-        //add(inputField, BorderLayout.SOUTH);
-        add(errorField, BorderLayout.EAST);
+        // show frame
+        setVisible(true);
     }
-    
-    //potentially create a different class to handle this.
+
+    /*
+        Called automatically when AppState changes
+    */
     @Override
-    public int showMenu() {
+    public void onStateChanged(GameState state) {
 
-        final int[] result = {-1};
-
-        JDialog dialog = new JDialog((JFrame) null, "Feed Me Java!", true);
-        dialog.setSize(900, 700);
-        dialog.setLocationRelativeTo(null);
-        
-        JPanel panel = new BackgroundPanel("Backgrounds/MenuBgWithLogo.png.png");
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        JButton startButton = new JButton("Start New Game");
-        JButton loadButton = new JButton("Load Game");
-        JButton exitButton = new JButton("Exit");
-
-        startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        loadButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        exitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        startButton.addActionListener(e -> {
-            result[0] = 1;
-            dialog.dispose();
-        });
-
-        loadButton.addActionListener(e -> {
-            result[0] = 2;
-            dialog.dispose();
-        });
-
-        exitButton.addActionListener(e -> {
-            result[0] = 3;
-            dialog.dispose();
-        });
-
-        panel.add(Box.createVerticalGlue());
-        panel.add(startButton);
-        panel.add(Box.createVerticalStrut(20));
-        panel.add(loadButton);
-        panel.add(Box.createVerticalStrut(20));
-        panel.add(exitButton);
-        panel.add(Box.createVerticalGlue());
-
-        dialog.add(panel);
-
-        dialog.setVisible(true);
-
-        return result[0];
-    }
-    
-    @Override
-    public void printStory(String user, String pet, Runnable onFinish) {
-
+        // remove current screen
         getContentPane().removeAll();
 
-        add(new IntroPanel(user, pet, onFinish));
+        switch (state) {
 
-        revalidate();
-        repaint();
-    }
+            case MENU -> {
+                add(
+                    new MenuPanel(
+                        () -> appState.setState(GameState.NAME_INPUT),
 
-    @Override
-    public void displayText(String text) {
-        mainTextArea.setText(text);
-    }
+                        () -> appState.setState(GameState.LOAD_GAME),
 
-    @Override
-    public void displayError(String text) {
-        errorField.setText(text);
-    }
-    @Override
-    public String getUserInput(String prompt) {
-
-        // Clear current screen
-        getContentPane().removeAll();
-
-        // Create a centered panel
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-
-        JLabel promptLabel = new JLabel(prompt);
-        promptLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        inputField.setText("");
-        inputField.setMaximumSize(new Dimension(300, 30));
-        inputField.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        centerPanel.add(Box.createVerticalGlue());
-        centerPanel.add(promptLabel);
-        centerPanel.add(Box.createVerticalStrut(20));
-        centerPanel.add(inputField);
-        centerPanel.add(Box.createVerticalStrut(10));
-        centerPanel.add(submitButton);
-        centerPanel.add(Box.createVerticalGlue());
-
-        add(centerPanel, BorderLayout.CENTER);
-
-        revalidate();
-        repaint();
-
-        final String[] result = new String[1];
-        
-        ActionListener submitAction = e -> {
-            String input = inputField.getText().trim();
-
-            // Reject empty input
-            if (!InputValidator.validStr(input)) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Please enter a value."
+                        () -> System.exit(0)
+                    ),
+                    BorderLayout.CENTER
                 );
-                return;
             }
 
-            result[0] = input;
+            case NAME_INPUT -> {
 
-            synchronized (result) {
-                result.notify();
+                add(
+                    new NameInputPanel(
+                        user -> {
+                            System.out.println(
+                                "User entered: "
+                                + user.getUsername()
+                            );
+
+                            appState.setState(
+                                GameState.QUIZ
+                            );
+                        }
+                    ),
+                    BorderLayout.CENTER
+                );
             }
-        };
 
-        // Click Submit button
-        submitButton.addActionListener(submitAction);
+            case LOAD_GAME -> {
 
-        // Press Enter in text field
-        inputField.addActionListener(submitAction);
-        
+                add(
+                    new LoadPanel(
+                        username -> {
+                            System.out.println(
+                                "Loading: "
+                                + username
+                            );
 
-        inputField.requestFocusInWindow();
-
-        synchronized (result) {
-            while (result[0] == null) {
-                try {
-                    result.wait();
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
+                            appState.setState(
+                                GameState.QUIZ
+                            );
+                        }
+                    ),
+                    BorderLayout.CENTER
+                );
             }
-        }
 
-        submitButton.removeActionListener(submitAction);
-        inputField.removeActionListener(submitAction);
-        return result[0];
-    }
+            case QUIZ -> {
 
-    @Override
-    public void slowPrint(String text) {
-        return;
-    }
+                JPanel placeholder =
+                    new JPanel();
 
-    @Override
-    public void showQuiz(
-        QuizSession quiz,
-        Runnable onFinish
-    ) {
-        getContentPane().removeAll();
+                placeholder.add(
+                    new JLabel(
+                        "Quiz screen here"
+                    )
+                );
 
-        // Get current question from QuizSession
-        Question q =
-            quiz.getCurrentQuestion();
-
-        // Pass callback into QuizPanel
-        add(
-            new QuizPanel(
-                q,
-                quiz,
-                this,
-                onFinish
-            )
-        );
-
-        revalidate();
-        repaint();
-    }
-    
-   public void showResult(
-        boolean correct,
-        QuizSession quiz,
-        String explanation,
-        Runnable onNext
-    ) {
-        getContentPane().removeAll();
-
-        add(
-            new ResultPanel(
-                correct,
-                quiz,
-                explanation,
-                onNext
-            )
-        );
-
-        revalidate();
-        repaint();
-    }
-   
-    @Override
-    public void showEnd(QuizSession quiz,Runnable onFinish) {
-        
-        getContentPane().removeAll();
-
-        add(
-            new EndPanel(
-                quiz,
-                this,
-                onFinish
-            )
-        );
-
-        revalidate();
-        repaint();
-    }
-    
-    @Override
-    public void inputNames(Consumer<User> onSubmit) {
-        getContentPane().removeAll();
-
-        NameInputPanel panel =
-            new NameInputPanel(onSubmit);
-
-        add(panel);
-        revalidate();
-        repaint();
-    }    
-    
-    @Override
-    public String inputLoadName() {
-
-        final String[] result = new String[1];
-
-        getContentPane().removeAll();
-
-        LoadPanel panel = new LoadPanel(username -> {
-            result[0] = username;
-
-            synchronized (result) {
-                result.notify();
+                add(
+                    placeholder,
+                    BorderLayout.CENTER
+                );
             }
-        });
 
-        add(panel);
+            case RESULTS -> {
 
-        revalidate();
-        repaint();
+                JPanel placeholder =
+                    new JPanel();
 
-        synchronized (result) {
-            while (result[0] == null) {
-                try {
-                    result.wait();
-                }
-                catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
+                placeholder.add(
+                    new JLabel(
+                        "Results screen"
+                    )
+                );
+
+                add(
+                    placeholder,
+                    BorderLayout.CENTER
+                );
             }
         }
 
-        return result[0];
+        revalidate();
+        repaint();
     }
-    
 }

@@ -6,12 +6,11 @@ package Model;
 
 /**
  *
- * @author hmarl
+ * @author 2
  */
-public interface ModelListener {
-    public void onExistingUser();
-    public void onNewUser();
-    public void onEnterAnswer();
-    public void onScoreUpdated();
-    
+
+public interface StateListener {
+
+    void onStateChanged(GameState state);
+
 }

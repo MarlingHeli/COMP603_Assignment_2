@@ -52,19 +52,21 @@ public class QuizSession {
         currentQuestionIndex++;
     }
     
-    public void incrementScore() {
-        numCorrectAnswers++;
-    }
+//    public void incrementScore() {
+//        numCorrectAnswers++;
+//    }
     
     public String getScoreText() {
         return "You got " + numCorrectAnswers + "/" + questions.size() + " questions correct.";
     }
     
     public String getTrophy() {
-
-        double percentage =
-            (double) numCorrectAnswers /
-            questions.size() * 100;
+        //prevent division by 0
+        if (questions.isEmpty())
+        {
+            return "[ERROR] Improper score calculation";
+        }
+        double percentage = (double) numCorrectAnswers/questions.size() * 100;
 
         if (percentage >= 80) {
             return "GOLD";
@@ -82,10 +84,13 @@ public class QuizSession {
     }
     
     public String getEndingDialogue() {
-
-        double percentage =
-            (double) numCorrectAnswers /
-            questions.size() * 100;
+        //prevent division by 0
+        if (questions.isEmpty())
+        {
+            return "[ERROR] Improper ending";
+        }
+        
+        double percentage = (double) numCorrectAnswers/questions.size() * 100;
 
         if (percentage >= 80) {
             return user.getPetName()

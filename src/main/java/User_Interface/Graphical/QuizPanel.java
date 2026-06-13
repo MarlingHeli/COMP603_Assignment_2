@@ -2,6 +2,7 @@ package User_Interface.Graphical;
 
 import javax.swing.*;
 import java.awt.*;
+
 import Model.QuizSession;
 import Question.Question;
 
@@ -15,13 +16,17 @@ public class QuizPanel extends BackgroundPanel {
     public QuizPanel(
         Question question,
         QuizSession quiz,
-        GUI gui,
-        Runnable onFinish
+        Runnable onAnswerSubmitted
     ) {
 
-        super("resources/Backgrounds/QuizBg.png");
+        super("/Backgrounds/QuizBg.png");
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(
+            new BoxLayout(
+                this,
+                BoxLayout.Y_AXIS
+            )
+        );
 
         JLabel questionLabel =
             new JLabel(
@@ -38,15 +43,20 @@ public class QuizPanel extends BackgroundPanel {
             question.getOptions();
 
         option1 =
-            new JRadioButton(options[0]);
+            new JRadioButton(
+                options[0]
+            );
 
         option2 =
-            new JRadioButton(options[1]);
+            new JRadioButton(
+                options[1]
+            );
 
         option3 =
-            new JRadioButton(options[2]);
+            new JRadioButton(
+                options[2]
+            );
 
-        // make radio buttons transparent
         option1.setOpaque(false);
         option2.setOpaque(false);
         option3.setOpaque(false);
@@ -59,67 +69,62 @@ public class QuizPanel extends BackgroundPanel {
         group.add(option3);
 
         submitButton =
-            new JButton("Submit");
+            new JButton(
+                "Submit"
+            );
 
         submitButton.setAlignmentX(
             Component.CENTER_ALIGNMENT
         );
 
         add(Box.createVerticalGlue());
-
         add(questionLabel);
-
         add(Box.createVerticalStrut(30));
-
         add(option1);
         add(option2);
         add(option3);
-
         add(Box.createVerticalStrut(20));
-
         add(submitButton);
-
         add(Box.createVerticalGlue());
 
-        submitButton.addActionListener(e -> {
+        submitButton.addActionListener(
+            e -> {
 
-            int answer = -1;
+                int answer = -1;
 
-            if (option1.isSelected())
-                answer = 1;
+                if (option1.isSelected())
+                    answer = 1;
 
-            else if (option2.isSelected())
-                answer = 2;
+                else if (option2.isSelected())
+                    answer = 2;
 
-            else if (option3.isSelected())
-                answer = 3;
+                else if (option3.isSelected())
+                    answer = 3;
 
-            if (answer == -1) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Choose an answer."
-                );
-                return;
+                if (answer == -1) {
+
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Choose an answer."
+                    );
+
+                    return;
+                }
+
+                boolean correct =
+                    question.checkAnswer(
+                        String.valueOf(answer)
+                    );
+
+                if (correct) {
+                    quiz.answerCorrect();
+                }
+                else {
+                    quiz.answerWrong();
+                }
+
+                onAnswerSubmitted.run();
             }
-
-            boolean correct =
-                question.checkAnswer(
-                    String.valueOf(answer)
-                );
-
-            if (correct) {
-                quiz.answerCorrect();
-            }
-            else {
-                quiz.answerWrong();
-            }
-
-            gui.showResult(
-                correct,
-                quiz,
-                question.getExplanation(),
-                onFinish
-            );
-        });
+        );
     }
 }

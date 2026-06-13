@@ -20,7 +20,7 @@ public class LoadPanel extends BackgroundPanel {
 
     public LoadPanel(Consumer<String> onSubmit) {
 
-        super("resources/Backgrounds/StartNewGameBg.png");
+        super("/Backgrounds/StartNewGameBg.png");
 
         setLayout(new GridBagLayout());
 

@@ -13,7 +13,7 @@ public class NameInputPanel extends BackgroundPanel {
 
     public NameInputPanel(Consumer<User> onSubmit) {
 
-        super("Backgrounds/StartNewGameBg.png");
+        super("/Backgrounds/StartNewGameBg.png");
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 

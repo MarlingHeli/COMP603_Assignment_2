@@ -18,7 +18,4 @@ public interface UserRecord {
 
     User loadRecord(String username);
 
-    void saveGame(QuizSession session);
-
-    QuizSession loadGame(User user);
 }
