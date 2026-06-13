@@ -51,8 +51,14 @@ public class NewGamePanel extends JPanel {
  JOptionPane.showMessageDialog(this, "Fields cannot be blank!");
  }
  });
- gbc.gridy = 3; gbc.gridwidth = 2;
+ gbc.gridy = 3; gbc.gridwidth = 2; gbc.insets = new Insets(12, 8, 4, 8);
  rightSidePanel.add(startBtn, gbc);
+ // ADDED: "Back to Menu" option centered under the main submit button inside the form flow
+ JButton backBtn = new JButton("Back to Menu");
+ backBtn.setPreferredSize(new Dimension(150, 35));
+ backBtn.addActionListener(e -> controller.start());
+ gbc.gridy = 4; gbc.insets = new Insets(4, 8, 8, 8);
+ rightSidePanel.add(backBtn, gbc);
  bgPanel.add(rightSidePanel);
  add(bgPanel, BorderLayout.CENTER);
  }

@@ -32,7 +32,6 @@ public class QuizPanel extends JPanel {
  mainGbc.gridx = 0; mainGbc.gridy = 0;
  mainGbc.fill = GridBagConstraints.BOTH;
  mainGbc.weightx = 1.0; mainGbc.weighty = 1.0;
- // manually resized this (Author 2)
  mainGbc.insets = new Insets(3, 130, 3, 130);
  // 2. Create a fully transparent content card panel with no visible borders
  JPanel contentCard = new JPanel(new BorderLayout());
@@ -122,39 +121,30 @@ public class QuizPanel extends JPanel {
  // Forces multi-line line breaks on questions to fit cleanly within rectangle bounds
  qLabel.setText("<html><center><div style='width: 320px; text-align: center;'>" + q.getQuestionText().replace("\n", "<br>") + "</div></center></html>");
  String[] options = q.getOptions();
- // FIXED: Wraps option text in HTML div boundaries to force newlines on overly long choices
+ // FIXED: Explicitly target specific indices, [1], and [2] inside the text arrays to print clean strings
  opt1.setText("<html><div style='width: 300px; text-align: left;'>" + options[0] + "</div></html>");
  opt2.setText("<html><div style='width: 300px; text-align: left;'>" + options[1] + "</div></html>");
  opt3.setText("<html><div style='width: 300px; text-align: left;'>" + options[2] + "</div></html>");
  group.clearSelection();
  }
  }
- // Evaluates quiz radio state matching conditions against database model indexes
+ // Evaluates quiz radio state matching conditions against backend question rules
  private void processAnswer() {
  QuizSession session = appState.getCurrentQuiz();
  if (session == null) return;
  Question q = session.getCurrentQuestion();
  if (q == null || q.getOptions() == null) return;
- String[] options = q.getOptions();
- String selectedText = null;
- // FIXED: Checks pure raw backend model string elements rather than layout decorated HTML strings
- if (opt1.isSelected()) selectedText = options[0];
- else if (opt2.isSelected()) selectedText = options[1];
- else if (opt3.isSelected()) selectedText = options[2];
- if (selectedText == null) {
+ String targetChoiceIndexString = null;
+ if (opt1.isSelected()) targetChoiceIndexString = "1";
+ else if (opt2.isSelected()) targetChoiceIndexString = "2";
+ else if (opt3.isSelected()) targetChoiceIndexString = "3";
+ if (targetChoiceIndexString == null) {
  JOptionPane.showMessageDialog(this, "Please select an answer option.");
  return;
  }
- if (q.checkAnswer(selectedText)) {
- JOptionPane.showMessageDialog(this, "Correct!");
- session.answerCorrect();
- } else {
- JOptionPane.showMessageDialog(this, "Wrong! \n" + q.getExplanation());
- session.answerWrong();
+ boolean isCorrect = q.checkAnswer(targetChoiceIndexString);
+ controller.processAnswerSubmission(isCorrect, q.getExplanation());
  }
- refreshQuiz();
- }
- // Smoothly gray-tints target component pixels during user click events
  private Image grayScaleImage(Image src) {
  try {
  java.awt.image.ImageFilter filter = new javax.swing.GrayFilter(true, 50);

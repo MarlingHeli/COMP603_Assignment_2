@@ -22,6 +22,7 @@ Persistence\DatabaseDAO.class
 User_Interface\Graphical\MenuPanel.class
 User_Interface\Graphical\EndPanel.class
 Persistence\DatabaseUser.class
+User_Interface\Graphical\ResultPanel$1.class
 Model\QuizSession.class
 Validation\InputValidator.class
 Question\MultiChoiceQuestion.class

@@ -16,11 +16,20 @@ public class MainController {
  private AppStateModel appState;
  private GUI gui;
  private User user;
+ private boolean lastAnswerWasCorrect;
+ private String lastExplanationText;
  public MainController() {
  appState = new AppStateModel();
  gui = new GUI(appState, this);
  databaseManager = new DatabaseManager();
  Connection connection = databaseManager.getConnection();
+ // SAFETY GUARD: If connection is null, warn the player and close gracefully instead of throwing a NullPointerException
+ if (connection == null) {
+ JOptionPane.showMessageDialog(gui, 
+ "Database Connection Error!\nThe database file might be locked by another running instance of the game or IDE.\nPlease close background Java tasks and restart the application.", 
+ "Connection Failure", JOptionPane.ERROR_MESSAGE);
+ System.exit(1);
+ }
  databaseUser = new DatabaseUser(connection);
  databaseQuestions = new DatabaseQuestions(connection);
  databaseQuizSession = new DatabaseQuizSession(connection);
@@ -52,35 +61,46 @@ public class MainController {
  public void proceedToQuiz() {
  appState.setState(GameState.QUIZ);
  }
+ public void processAnswerSubmission(boolean isCorrect, String explanation) {
+ this.lastAnswerWasCorrect = isCorrect;
+ this.lastExplanationText = explanation;
+ QuizSession session = appState.getCurrentQuiz();
+ if (session != null) {
+ if (isCorrect) { session.answerCorrect(); } 
+ else { session.answerWrong(); }
+ }
+ appState.setState(GameState.RESULT);
+ }
+ public void advanceFromFeedback() {
+ QuizSession session = appState.getCurrentQuiz();
+ if (session == null || session.isFinished()) {
+ completeQuiz();
+ } else {
+ appState.setState(GameState.QUIZ);
+ }
+ }
  public void completeQuiz() {
  QuizSession quiz = appState.getCurrentQuiz();
- if (quiz != null) {
- quiz.updateHighScore();
- }
+ if (quiz != null) { quiz.updateHighScore(); }
  appState.setState(GameState.END);
  }
  public void loadGame() {
- String inputName = JOptionPane.showInputDialog(gui, "Enter your Username to load game:", "Load Saved Game", JOptionPane.QUESTION_MESSAGE);
- if (inputName == null || inputName.trim().isEmpty()) {
- return;
+ appState.setState(GameState.LOAD_SCREEN);
  }
- inputName = inputName.trim();
- User loadedUser = databaseUser.loadRecord(inputName);
- if (loadedUser == null) {
- JOptionPane.showMessageDialog(gui, "Username not found in database!", "Error", JOptionPane.ERROR_MESSAGE);
- return;
+ public User verifyAndFetchUser(String username) {
+ return databaseUser.loadRecord(username);
  }
- this.user = loadedUser;
+ public QuizSession fetchSavedSession(User targetedUser) {
+ return databaseQuizSession.loadGame(targetedUser);
+ }
+ public void resumeLoadedQuiz(User gameUser, QuizSession restoredQuiz) {
+ this.user = gameUser;
  appState.setCurrentUser(this.user);
- QuizSession savedQuiz = databaseQuizSession.loadGame(this.user);
- if (savedQuiz != null) {
- appState.setCurrentQuiz(savedQuiz);
+ appState.setCurrentQuiz(restoredQuiz);
  appState.setState(GameState.QUIZ);
- JOptionPane.showMessageDialog(gui, "Welcome back " + this.user.getUsername() + "! Resuming quiz at question " + (savedQuiz.getCurrentQuestionIndex() + 1) + ".");
- } else {
- JOptionPane.showMessageDialog(gui, "No active saved session found for this user.", "No Save Found", JOptionPane.INFORMATION_MESSAGE);
  }
- }
+ public boolean isLastAnswerCorrect() { return lastAnswerWasCorrect; }
+ public String getLastExplanationText() { return lastExplanationText; }
  public void exit() {
  databaseManager.close();
  System.exit(0);
