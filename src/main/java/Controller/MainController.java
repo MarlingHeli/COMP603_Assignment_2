@@ -63,11 +63,13 @@ public class MainController {
     }
 
     public void start() {
+        System.out.println("start()");
         showMenu();
     }
 
     private void showMenu() {
 
+        System.out.println("showMenu()");
         int choice =
             ui.showMenu();
 

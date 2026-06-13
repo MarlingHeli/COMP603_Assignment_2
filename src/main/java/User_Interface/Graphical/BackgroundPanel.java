@@ -25,26 +25,43 @@ public class BackgroundPanel extends JPanel {
         backgroundImage = icon.getImage();
         
     }*/
-    
     public BackgroundPanel(String backImg) {
 
     java.net.URL url =
         getClass().getResource(backImg);
 
-//    System.out.println(url);
+    System.out.println("Searching for: " + backImg);
+    System.out.println("URL = " + url);
+
+    if (url == null) {
+        throw new IllegalArgumentException(
+            "Image not found: " + backImg
+        );
+    }
 
     ImageIcon icon = new ImageIcon(url);
-
-//    System.out.println(
-//        "Width = " + icon.getIconWidth()
-//    );
-//
-//    System.out.println(
-//        "Height = " + icon.getIconHeight()
-//    );
-
     backgroundImage = icon.getImage();
 }
+    
+//    public BackgroundPanel(String backImg) {
+//
+//    java.net.URL url =
+//        getClass().getResource(backImg);
+//
+////    System.out.println(url);
+//
+//    ImageIcon icon = new ImageIcon(url);
+//
+////    System.out.println(
+////        "Width = " + icon.getIconWidth()
+////    );
+////
+////    System.out.println(
+////        "Height = " + icon.getIconHeight()
+////    );
+//
+//    backgroundImage = icon.getImage();
+//}
 
     @Override
    protected void paintComponent(Graphics g) {

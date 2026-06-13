@@ -32,6 +32,8 @@ public class GUI extends JFrame implements UI {
         inputField = new JTextField(20);
         submitButton = new JButton("Submit");
 
+        setLayout(new BorderLayout());
+
         JPanel bottomPanel = new JPanel();
 
         bottomPanel.add(inputField);
@@ -40,8 +42,6 @@ public class GUI extends JFrame implements UI {
         add(bottomPanel, BorderLayout.SOUTH);
 
         errorField.setEditable(false);
-
-        setLayout(new BorderLayout());
 
         add(mainTextArea, BorderLayout.CENTER);
         //add(inputField, BorderLayout.SOUTH);
@@ -58,7 +58,7 @@ public class GUI extends JFrame implements UI {
         dialog.setSize(900, 700);
         dialog.setLocationRelativeTo(null);
         
-        JPanel panel = new BackgroundPanel("Backgrounds/MenuBgWithLogo.png.png");
+        JPanel panel = new BackgroundPanel("/Backgrounds/MenuBgWithLogo.png");
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         JButton startButton = new JButton("Start New Game");
@@ -94,7 +94,7 @@ public class GUI extends JFrame implements UI {
 
         dialog.add(panel);
 
-        dialog.setVisible(true);
+//        dialog.setVisible(true);
 
         return result[0];
     }
