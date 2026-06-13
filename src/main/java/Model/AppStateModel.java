@@ -6,18 +6,18 @@ import java.util.List;
 public class AppStateModel {
 
     private GameState currentState;
-    private final List<StateListener> listeners =
-        new ArrayList<>();
+    private User currentUser;
+    private QuizSession currentQuiz;
+    private boolean skipIntro;
 
-    public void addListener(
-        StateListener listener
-    ) {
+    private final List<StateListener> listeners =
+            new ArrayList<>();
+
+    public void addListener(StateListener listener) {
         listeners.add(listener);
     }
 
-    public void setState(
-        GameState newState
-    ) {
+    public void setState(GameState newState) {
         currentState = newState;
         notifyListeners();
     }
@@ -26,14 +26,33 @@ public class AppStateModel {
         return currentState;
     }
 
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentQuiz(QuizSession quiz) {
+        this.currentQuiz = quiz;
+    }
+
+    public QuizSession getCurrentQuiz() {
+        return currentQuiz;
+    }
+
+    public void setSkipIntro(boolean skip) {
+        this.skipIntro = skip;
+    }
+
+    public boolean isSkipIntro() {
+        return skipIntro;
+    }
+
     private void notifyListeners() {
-        for (
-            StateListener listener
-            : listeners
-        ) {
-            listener.onStateChanged(
-                currentState
-            );
+        for (StateListener listener : listeners) {
+            listener.onStateChanged(currentState);
         }
     }
 }

@@ -2,130 +2,141 @@ package User_Interface.Graphical;
 
 import javax.swing.*;
 import java.awt.*;
-
-import Model.AppStateModel;
-import Model.StateListener;
-import Model.GameState;
+import Model.*;
 
 public class GUI extends JFrame implements StateListener {
 
     private final AppStateModel appState;
 
-    /*
-        Constructor
-    */
     public GUI(AppStateModel appState) {
 
         this.appState = appState;
 
-        // register observer
         appState.addListener(this);
 
-        setTitle("Feed Me Java!");
-        setSize(900, 700);
+        setTitle("Feed Me Java");
+        setSize(900,700);
+
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // use one central layout
-        setLayout(new BorderLayout());
+        setDefaultCloseOperation(
+                JFrame.EXIT_ON_CLOSE
+        );
 
-        // show frame
+        setLayout(
+                new BorderLayout()
+        );
+
         setVisible(true);
     }
 
-    /*
-        Called automatically when AppState changes
-    */
     @Override
-    public void onStateChanged(GameState state) {
+    public void onStateChanged(
+            GameState state
+    ) {
 
-        // remove current screen
         getContentPane().removeAll();
 
-        switch (state) {
+        switch(state) {
 
             case MENU -> {
+
                 add(
-                    new MenuPanel(
-                        () -> appState.setState(GameState.NAME_INPUT),
-
-                        () -> appState.setState(GameState.LOAD_GAME),
-
-                        () -> System.exit(0)
-                    ),
-                    BorderLayout.CENTER
+                        new MenuPanel(
+                                () -> appState.setState(
+                                        GameState.NAME_INPUT
+                                ),
+                                () -> appState.setState(
+                                        GameState.LOAD_GAME
+                                ),
+                                () -> System.exit(0)
+                        ),
+                        BorderLayout.CENTER
                 );
             }
 
             case NAME_INPUT -> {
 
                 add(
-                    new NameInputPanel(
-                        user -> {
-                            System.out.println(
-                                "User entered: "
-                                + user.getUsername()
-                            );
+                        new NameInputPanel(
+                                (user, skip) -> {
 
-                            appState.setState(
-                                GameState.QUIZ
-                            );
-                        }
-                    ),
-                    BorderLayout.CENTER
+                                    appState.setCurrentUser(
+                                            user
+                                    );
+
+                                    appState.setSkipIntro(
+                                            skip
+                                    );
+
+                                    if(skip) {
+
+                                        appState.setState(
+                                                GameState.QUIZ
+                                        );
+
+                                    }
+                                    else {
+
+                                        appState.setState(
+                                                GameState.INTRO
+                                        );
+                                    }
+                                }
+                        ),
+                        BorderLayout.CENTER
                 );
             }
 
-            case LOAD_GAME -> {
+            case INTRO -> {
+
+                User user =
+                        appState.getCurrentUser();
 
                 add(
-                    new LoadPanel(
-                        username -> {
-                            System.out.println(
-                                "Loading: "
-                                + username
-                            );
+                        new IntroPanel(
+                                user.getUsername(),
+                                user.getPetName(),
 
-                            appState.setState(
-                                GameState.QUIZ
-                            );
-                        }
-                    ),
-                    BorderLayout.CENTER
+                                () -> appState.setState(
+                                        GameState.QUIZ
+                                )
+                        ),
+                        BorderLayout.CENTER
                 );
             }
 
             case QUIZ -> {
 
-                JPanel placeholder =
-                    new JPanel();
+                JPanel panel =
+                        new JPanel();
 
-                placeholder.add(
-                    new JLabel(
-                        "Quiz screen here"
-                    )
+                panel.add(
+                        new JLabel(
+                                "QUIZ GOES HERE"
+                        )
                 );
 
                 add(
-                    placeholder,
-                    BorderLayout.CENTER
+                        panel,
+                        BorderLayout.CENTER
                 );
             }
 
             case RESULTS -> {
 
-                JPanel placeholder =
-                    new JPanel();
+                JPanel panel =
+                        new JPanel();
 
-                placeholder.add(
-                    new JLabel(
-                        "Results screen"
-                    )
+                panel.add(
+                        new JLabel(
+                                "RESULTS"
+                        )
                 );
 
                 add(
-                    placeholder,
-                    BorderLayout.CENTER
+                        panel,
+                        BorderLayout.CENTER
                 );
             }
         }
