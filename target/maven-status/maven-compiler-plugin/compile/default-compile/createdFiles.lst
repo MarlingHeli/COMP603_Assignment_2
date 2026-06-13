@@ -3,6 +3,7 @@ User_Interface\Graphical\IntroPanel$1.class
 User_Interface\Graphical\BackgroundPanel.class
 Persistence\DatabaseManager.class
 Persistence\DatabaseQuestions.class
+User_Interface\Graphical\GUI$1.class
 Validation\QuizValidator.class
 Model\GameState.class
 User_Interface\UI.class

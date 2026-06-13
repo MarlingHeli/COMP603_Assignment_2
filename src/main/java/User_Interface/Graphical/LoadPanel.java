@@ -93,7 +93,7 @@ public class LoadPanel extends JPanel {
  confirmLoadBtn.setPreferredSize(new Dimension(0, 40));
  confirmLoadBtn.addActionListener(e -> processSaveExecution());
  controlsColumn.add(confirmLoadBtn);
- JButton innerBackBtn = new JButton("Change User Profile");
+ JButton innerBackBtn = new JButton("Access a different user's saves");
  innerBackBtn.setPreferredSize(new Dimension(0, 40));
  innerBackBtn.addActionListener(e -> resetToUserLookup());
  controlsColumn.add(innerBackBtn);

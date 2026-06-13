@@ -23,7 +23,6 @@ public class MainController {
  gui = new GUI(appState, this);
  databaseManager = new DatabaseManager();
  Connection connection = databaseManager.getConnection();
- // SAFETY GUARD: If connection is null, warn the player and close gracefully instead of throwing a NullPointerException
  if (connection == null) {
  JOptionPane.showMessageDialog(gui, 
  "Database Connection Error!\nThe database file might be locked by another running instance of the game or IDE.\nPlease close background Java tasks and restart the application.", 
@@ -98,6 +97,20 @@ public class MainController {
  appState.setCurrentUser(this.user);
  appState.setCurrentQuiz(restoredQuiz);
  appState.setState(GameState.QUIZ);
+ }
+ // FIXED: Switched method call from saveRecord to saveGame to match DatabaseQuizSession
+ public void saveAndExit() {
+ QuizSession currentSession = appState.getCurrentQuiz();
+ if (currentSession != null && user != null) {
+ try {
+ databaseUser.saveRecord(user);
+ databaseQuizSession.saveGame(currentSession);
+ JOptionPane.showMessageDialog(gui, "Game progression saved successfully for " + user.getUsername() + "!", "Save Complete", JOptionPane.INFORMATION_MESSAGE);
+ } catch (Exception e) {
+ JOptionPane.showMessageDialog(gui, "Failed to save game data progression records properly.", "Save Error", JOptionPane.ERROR_MESSAGE);
+ }
+ }
+ exit();
  }
  public boolean isLastAnswerCorrect() { return lastAnswerWasCorrect; }
  public String getLastExplanationText() { return lastExplanationText; }
