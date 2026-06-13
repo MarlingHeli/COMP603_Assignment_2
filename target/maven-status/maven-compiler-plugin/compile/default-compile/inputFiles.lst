@@ -1,4 +1,3 @@
-C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\Controller\Controller.java
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\Controller\MainController.java
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\Model\AppStateModel.java
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\Model\GameState.java
@@ -27,7 +26,7 @@ C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interfa
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\IntroPanel.java
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\LoadPanel.java
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\MenuPanel.java
-C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\NameInputPanel.java
+C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\NewGamePanel.java
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\QuizPanel.java
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\ResultPanel.java
 C:\Users\2\Documents\AUT\COMP603\COMP603_Assignment_2\src\main\java\User_Interface\UI.java

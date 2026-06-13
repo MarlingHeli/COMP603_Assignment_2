@@ -1,147 +1,49 @@
 package User_Interface.Graphical;
-
+import Controller.MainController;
+import Model.GameState;
+import Model.StateListener;
+import Model.AppStateModel;
 import javax.swing.*;
 import java.awt.*;
-import Model.*;
-
 public class GUI extends JFrame implements StateListener {
-
-    private final AppStateModel appState;
-
-    public GUI(AppStateModel appState) {
-
-        this.appState = appState;
-
-        appState.addListener(this);
-
-        setTitle("Feed Me Java");
-        setSize(900,700);
-
-        setLocationRelativeTo(null);
-
-        setDefaultCloseOperation(
-                JFrame.EXIT_ON_CLOSE
-        );
-
-        setLayout(
-                new BorderLayout()
-        );
-
-        setVisible(true);
-    }
-
-    @Override
-    public void onStateChanged(
-            GameState state
-    ) {
-
-        getContentPane().removeAll();
-
-        switch(state) {
-
-            case MENU -> {
-
-                add(
-                        new MenuPanel(
-                                () -> appState.setState(
-                                        GameState.NAME_INPUT
-                                ),
-                                () -> appState.setState(
-                                        GameState.LOAD_GAME
-                                ),
-                                () -> System.exit(0)
-                        ),
-                        BorderLayout.CENTER
-                );
-            }
-
-            case NAME_INPUT -> {
-
-                add(
-                        new NameInputPanel(
-                                (user, skip) -> {
-
-                                    appState.setCurrentUser(
-                                            user
-                                    );
-
-                                    appState.setSkipIntro(
-                                            skip
-                                    );
-
-                                    if(skip) {
-
-                                        appState.setState(
-                                                GameState.QUIZ
-                                        );
-
-                                    }
-                                    else {
-
-                                        appState.setState(
-                                                GameState.INTRO
-                                        );
-                                    }
-                                }
-                        ),
-                        BorderLayout.CENTER
-                );
-            }
-
-            case INTRO -> {
-
-                User user =
-                        appState.getCurrentUser();
-
-                add(
-                        new IntroPanel(
-                                user.getUsername(),
-                                user.getPetName(),
-
-                                () -> appState.setState(
-                                        GameState.QUIZ
-                                )
-                        ),
-                        BorderLayout.CENTER
-                );
-            }
-
-            case QUIZ -> {
-
-                JPanel panel =
-                        new JPanel();
-
-                panel.add(
-                        new JLabel(
-                                "QUIZ GOES HERE"
-                        )
-                );
-
-                add(
-                        panel,
-                        BorderLayout.CENTER
-                );
-            }
-
-            case RESULTS -> {
-
-                JPanel panel =
-                        new JPanel();
-
-                panel.add(
-                        new JLabel(
-                                "RESULTS"
-                        )
-                );
-
-                add(
-                        panel,
-                        BorderLayout.CENTER
-                );
-            }
-        }
-
-        revalidate();
-        repaint();
-    }
+ private AppStateModel appState;
+ private MainController controller;
+ private CardLayout cardLayout;
+ private JPanel container;
+ private MenuPanel menuPanel;
+ private NewGamePanel newGamePanel;
+ private IntroPanel introPanel;
+ private QuizPanel quizPanel;
+ private EndPanel endPanel;
+ public GUI(AppStateModel appState, MainController controller) {
+ this.appState = appState;
+ this.controller = controller;
+ this.cardLayout = new CardLayout();
+ this.container = new JPanel(cardLayout);
+ setTitle("Feed Me Java");
+ setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+ setSize(800, 600);
+ setLocationRelativeTo(null);
+ menuPanel = new MenuPanel(controller);
+ newGamePanel = new NewGamePanel(controller);
+ introPanel = new IntroPanel(controller, appState);
+ quizPanel = new QuizPanel(controller, appState);
+ endPanel = new EndPanel(controller, appState);
+ container.add(menuPanel, GameState.MENU.name());
+ container.add(newGamePanel, GameState.NAME_INPUT.name());
+ container.add(introPanel, GameState.INTRO.name());
+ container.add(quizPanel, GameState.QUIZ.name());
+ container.add(endPanel, GameState.END.name());
+ add(container);
+ setVisible(true);
+ }
+ @Override
+ public void onStateChanged(GameState state) {
+ if (state == GameState.QUIZ) {
+ quizPanel.refreshQuiz();
+ } else if (state == GameState.END) {
+ endPanel.refreshResults();
+ }
+ cardLayout.show(container, state.name());
+ }
 }

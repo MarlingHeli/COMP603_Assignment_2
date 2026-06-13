@@ -1,227 +1,93 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package User_Interface.Graphical;
-
-/**
- *
- * @author 2
- */
-
+import Controller.MainController;
+import Model.AppStateModel;
 import javax.swing.*;
 import java.awt.*;
-
 public class IntroPanel extends JPanel {
-    private Runnable onFinish;
-
-    private JTextArea storyText;
-    private JLabel imageLabel;
-    private JButton nextButton;
-
-    private int currentPage = 0;
-
-    private String user;
-    private String pet;
-
-    private String[] storyPages;
-    
-    
-    
-    public IntroPanel(String user, String pet, Runnable onFinish) {
-        System.out.println("IntroPanel created");
-        this.user = user;
-        this.pet = pet;
-        this.onFinish = onFinish;
-        
-        setLayout(new BorderLayout());
-        
-        storyText = new JTextArea();
-        imageLabel = new JLabel();
-        nextButton = new JButton("Next");
-        
-        storyPages = new String[] {
-
-            "=== INTRODUCTION ===",
-
-            "I was about to relax at home when "
-            + pet
-            + " squeezed through the window.",
-
-            "\"Where did you go, buddy?\" I pulled "
-            + pet
-            + " into my arms."+
-            "\n\"You're always so adventurous.\"",
-
-            "\"I passed by the Animal University of Technology today.\""+
-            "\n\"There's a Java competition going on,\" "
-            + pet
-            + " announced."+
-            "\"I have enrolled you, "
-            + user
-            + ".\"",
-
-            "\"Why!? I don't know much Java!\" I protested.",
-
-            "\"Because first place wins a lifetime supply of pet food."+
-            "\nAnd I plan to FEAST!\" "
-            + pet
-            + " cackled.",
-
-            "I paused."+
-            "\n\"Well, it would spare my wallet...\""
-        };
-
-        showIntroduction();
-    }
-    
-    
-    
-    //-------------------------------------Methods------------------
-
-    private void typeWriter(JTextArea textArea, String text) {
-
-        textArea.setText("");
-
-        Timer timer = new Timer(30, null);
-
-        final int[] index = {0};
-
-        timer.addActionListener(e -> {
-
-            if (index[0] < text.length()) {
-
-                textArea.append(String.valueOf(text.charAt(index[0])));
-                index[0]++;
-
-            } else {
-
-                timer.stop();
-            }
-        });
-
-        timer.start();
-    }
-    
-    private void showIntroduction() {
-        System.out.println("Showing introduction");
-
-        removeAll();
-
-        JLabel introLabel = new JLabel("=== INTRODUCTION ===");
-        introLabel.setFont( new Font("Serif", Font.BOLD, 42));
-
-        
-        introLabel.setHorizontalAlignment(
-            SwingConstants.CENTER
-        );
-
-        add(introLabel, BorderLayout.CENTER);
-
-        revalidate();
-        repaint();
-
-        Timer timer = new Timer(1500, e -> {
-
-            currentPage = 1;
-
-            showStoryPage();
-
-        });
-
-        timer.setRepeats(false);
-
-        timer.start();
-    }
-    
-    private void showStoryPage() {
-        System.out.println("Showing page " + currentPage);
-
-        removeAll();
-
-        JPanel centerPanel = new JPanel(
-            new BorderLayout()
-        );
-        
-        storyText = new JTextArea();
-        storyText.setPreferredSize(new Dimension(800, 220));
-        storyText.setFont(new Font("Serif", Font.PLAIN, 28));
-        storyText.setLineWrap(true);
-        storyText.setWrapStyleWord(true);
-        storyText.setOpaque(false);
-        storyText.setEditable(false);
-        storyText.setEditable(false);
-
-        imageLabel = new JLabel();
-
-        imageLabel.setPreferredSize(
-            new Dimension(300,300)
-        );
-
-//      centerPanel.add(storyText, BorderLayout.NORTH);
-        JPanel textWrapper = new JPanel(new BorderLayout());
-
-        // Transparent so background can show through
-        textWrapper.setOpaque(false);
-        // 40px padding on top
-        textWrapper.setBorder(BorderFactory.createEmptyBorder(40, 20, 20, 20));
-        textWrapper.add(storyText, BorderLayout.CENTER);
-        centerPanel.add(textWrapper, BorderLayout.NORTH);
-        
-        centerPanel.add(imageLabel,
-                        BorderLayout.CENTER);
-
-        add(centerPanel,
-            BorderLayout.CENTER);
-
-        nextButton = new JButton("Next");
-
-        JPanel bottomPanel = new JPanel(
-            new FlowLayout(
-                FlowLayout.RIGHT
-            )
-        );
-
-        bottomPanel.add(nextButton);
-
-        add(bottomPanel,
-            BorderLayout.SOUTH);
-
-        typeWriter(
-            storyText,
-            storyPages[currentPage]
-        );
-
-        nextButton.addActionListener(e -> {
-
-            currentPage++;
-
-            if (currentPage < storyPages.length) {
-
-                showStoryPage();
-
-            } else {
-
-                if(onFinish != null) {onFinish.run();}
-
-            }
-
-        });
-
-        revalidate();
-        repaint();
-    }
-    
-    private void finishStory() {
-        JOptionPane.showMessageDialog(
-            this,
-            "Story Complete!"
-        );
-
-        if (onFinish != null) {
-            onFinish.run();
-        }
-    }
-    
-    
+ private JLabel storyLabel;
+ private JPanel bubbleBox;
+ private JButton actionBtn;
+ private int currentPage = 1;
+ private AppStateModel appState;
+ public IntroPanel(MainController controller, AppStateModel appState) {
+ this.appState = appState;
+ setLayout(new BorderLayout());
+ BackgroundPanel bgPanel;
+ try {
+ bgPanel = new BackgroundPanel("/Backgrounds/IntroImg.png");
+ } catch (Exception e) {
+ bgPanel = new BackgroundPanel("");
+ bgPanel.setBackground(Color.DARK_GRAY);
+ }
+ bgPanel.setLayout(new GridBagLayout());
+ GridBagConstraints gbc = new GridBagConstraints();
+ gbc.gridx = 0;
+ bubbleBox = new JPanel(new BorderLayout());
+ bubbleBox.setBackground(new Color(0, 0, 0, 190));
+ bubbleBox.setBorder(BorderFactory.createCompoundBorder(
+ BorderFactory.createLineBorder(new Color(255, 255, 255, 60), 1),
+ BorderFactory.createEmptyBorder(20, 25, 20, 25)
+ ));
+ storyLabel = new JLabel();
+ storyLabel.setFont(new Font("Monospaced", Font.BOLD, 15));
+ storyLabel.setForeground(Color.WHITE);
+ bubbleBox.add(storyLabel, BorderLayout.CENTER);
+ gbc.gridy = 0; gbc.weightx = 1.0; gbc.weighty = 0.5;
+ gbc.fill = GridBagConstraints.NONE;
+ gbc.anchor = GridBagConstraints.NORTH;
+ gbc.insets = new Insets(10, 0, 0, 0);
+ bgPanel.add(bubbleBox, gbc);
+ actionBtn = new JButton("Next");
+ actionBtn.setPreferredSize(new Dimension(220, 42));
+ actionBtn.setFont(new Font("Arial", Font.BOLD, 14));
+ actionBtn.addActionListener(e -> {
+ if (currentPage < 3) {
+ currentPage++;
+ updateStoryPage();
+ } else {
+ controller.proceedToQuiz();
+ }
+ });
+ gbc.gridy = 1; gbc.weighty = 0.5;
+ gbc.anchor = GridBagConstraints.SOUTH;
+ gbc.insets = new Insets(0, 0, 40, 0);
+ bgPanel.add(actionBtn, gbc);
+ add(bgPanel, BorderLayout.CENTER);
+ addComponentListener(new java.awt.event.ComponentAdapter() {
+ @Override
+ public void componentShown(java.awt.event.ComponentEvent e) {
+ currentPage = 1;
+ updateStoryPage();
+ }
+ });
+ }
+ private void updateStoryPage() {
+ if (appState.getCurrentUser() == null) return;
+ String user = appState.getCurrentUser().getUsername();
+ String pet = appState.getCurrentUser().getPetName();
+ StringBuilder sb = new StringBuilder();
+ sb.append("<html><div style='text-align: center; width: 500px;'>");
+ if (currentPage == 1) {
+ sb.append("I was about to relax at home when <b>").append(pet).append("</b> squeezed through the window.<br><br>");
+ sb.append("\"Where did you go, buddy?\" I pulled <b>").append(pet).append("</b> into my arms.<br><br>");
+ sb.append("\"You're always so adventurous.\"");
+ actionBtn.setText("Next");
+ } else if (currentPage == 2) {
+ sb.append("\"I passed by the Animal University of Technology today.<br>");
+ sb.append("There's a Java competition going on,\" <b>").append(pet).append("</b> announced.<br><br>");
+ sb.append("\"I have enrolled you, <b>").append(user).append("</b>.\"<br>");
+ sb.append("\"Why!? I don't know much Java,\" I protested.");
+ actionBtn.setText("Next");
+ } else if (currentPage == 3) {
+ sb.append("\"Because first place wins a lifetime supply of pet food.<br>");
+ sb.append("And I plan to FEAST!\" <b>").append(pet).append("</b> cackled.<br>");
+ sb.append("I paused.<br><br>");
+ sb.append("\"Well, it would spare my wallet...\"");
+ actionBtn.setText("Continue to Quiz");
+ }
+ sb.append("</div></html>");
+ storyLabel.setText(sb.toString());
+ bubbleBox.revalidate();
+ bubbleBox.repaint();
+ }
 }

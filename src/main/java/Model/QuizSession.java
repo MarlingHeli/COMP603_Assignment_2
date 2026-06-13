@@ -1,129 +1,59 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
-
-/**
- *
- * @author hmarl
- */
-
 import Question.Question;
 import java.util.List;
-
 public class QuizSession {
-    private int currentQuestionIndex;
-    private List<Question> questions;
-    private int numCorrectAnswers;
-    private User user;
-
-    public QuizSession(int currentQuestionIndex, List<Question> questions,
-                       int numCorrectAnswers, User user) 
-    {
-        this.currentQuestionIndex = currentQuestionIndex;
-        this.questions = questions;
-        this.numCorrectAnswers = numCorrectAnswers;
-        this.user = user;
-    }
-
-    public int getCurrentQuestionIndex() {
-        return currentQuestionIndex;
-    }
-
-    public List<Question> getQuestions() {
-        return questions;
-    }
-
-    public int getNumCorrectAnswers() {
-        return numCorrectAnswers;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void answerCorrect() {
-        numCorrectAnswers++;
-        currentQuestionIndex++;
-    }
-
-    public void answerWrong() {
-        currentQuestionIndex++;
-    }
-    
-//    public void incrementScore() {
-//        numCorrectAnswers++;
-//    }
-    
-    public String getScoreText() {
-        return "You got " + numCorrectAnswers + "/" + questions.size() + " questions correct.";
-    }
-    
-    public String getTrophy() {
-        //prevent division by 0
-        if (questions.isEmpty())
-        {
-            return "[ERROR] Improper score calculation";
-        }
-        double percentage = (double) numCorrectAnswers/questions.size() * 100;
-
-        if (percentage >= 80) {
-            return "GOLD";
-        }
-
-        if (percentage >= 70) {
-            return "SILVER";
-        }
-
-        if (percentage >= 60) {
-            return "BRONZE";
-        }
-
-        return "No Trophy...";
-    }
-    
-    public String getEndingDialogue() {
-        //prevent division by 0
-        if (questions.isEmpty())
-        {
-            return "[ERROR] Improper ending";
-        }
-        
-        double percentage = (double) numCorrectAnswers/questions.size() * 100;
-
-        if (percentage >= 80) {
-            return user.getPetName()
-                + " says: Congratulations! "
-                + "Your wallet has been saved!";
-        }
-
-        if (percentage >= 70) {
-            return user.getPetName()
-                + " says: Unfortunately silver "
-                + "does not win pet food.";
-        }
-
-        if (percentage >= 60) {
-            return user.getPetName()
-                + " says: Bronze is good, "
-                + "but no pet food.";
-        }
-
-        return user.getPetName()
-            + " says: Nice try. "
-            + "Can you do better?";
-    }
-    
-    public Question getCurrentQuestion() {
-    
-        // Safety check so we don't go out of bounds
-        if (currentQuestionIndex >= questions.size()) {
-            return null;
-        }
-
-        // Return question at current index
-        return questions.get(currentQuestionIndex);
-    }
-
+ private int currentQuestionIndex;
+ private List<Question> questions;
+ private int numCorrectAnswers;
+ private User user;
+ public QuizSession(int currentQuestionIndex, List<Question> questions, int numCorrectAnswers, User user) {
+ this.currentQuestionIndex = currentQuestionIndex;
+ this.questions = questions;
+ this.numCorrectAnswers = numCorrectAnswers;
+ this.user = user;
+ }
+ public int getCurrentQuestionIndex() { return currentQuestionIndex; }
+ public List<Question> getQuestions() { return questions; }
+ public int getNumCorrectAnswers() { return numCorrectAnswers; }
+ public User getUser() { return user; }
+ public Question getCurrentQuestion() {
+ if (isFinished()) { return null; }
+ return questions.get(currentQuestionIndex);
+ }
+ public boolean isFinished() { return currentQuestionIndex >= questions.size(); }
+ public void answerCorrect() { numCorrectAnswers++; currentQuestionIndex++; }
+ public void answerWrong() { currentQuestionIndex++; }
+ public void advanceQuestion() { currentQuestionIndex++; }
+ public int getTotalQuestions() { return questions.size(); }
+ public double getPercentage() {
+ if (questions.isEmpty()) { return 0; }
+ return ((double) numCorrectAnswers / questions.size()) * 100.0;
+ }
+ public void updateHighScore() {
+ user.saveHighestScore(numCorrectAnswers);
+ }
+ public String getScoreText() { return "You got " + numCorrectAnswers + "/" + questions.size() + " questions correct."; }
+ public String getTrophy() {
+ double percentage = getPercentage();
+ if (percentage >= 80) return "GOLD";
+ if (percentage >= 70) return "SILVER";
+ if (percentage >= 60) return "BRONZE";
+ return "NO TROPHY";
+ }
+ public String getEndingDialogue() {
+ double percentage = getPercentage();
+ String pet = user.getPetName();
+ if (percentage >= 80) return pet + " says: Congratulations! Your wallet has been saved!";
+ if (percentage >= 70) return pet + " says: Unfortunately silver does not win pet food.";
+ if (percentage >= 60) return pet + " says: Bronze is good, but no pet food.";
+ return pet + " says: Nice try. Can you do better?";
+ }
+ public String getQuestionIDString() {
+ StringBuilder builder = new StringBuilder();
+ for (int i = 0; i < questions.size(); i++) {
+ builder.append(questions.get(i).getQuestionID());
+ if (i < questions.size() - 1) builder.append(",");
+ }
+ return builder.toString();
+ }
 }
