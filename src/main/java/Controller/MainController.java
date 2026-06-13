@@ -1,51 +1,49 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package Controller;
 
-/**
- *
- * @author hmarl
- */
-
-import User_Interface.Graphical.GUI;
-//import User_Interface.Console.CUI;
-import User_Interface.UI;
-import User_Interface.Console.InputHelper;
-import User_Interface.Console.StoryPrinter;
+import Model.QuizSession;
+import Model.User;
+import Persistence.DatabaseManager;
+import Persistence.DatabaseQuestions;
+import Persistence.DatabaseQuizSession;
+import Persistence.DatabaseUser;
 import Question.Question;
 import Question.QuestionPool;
-import Persistence.UserRecordFileIO;
-import Persistence.UserRecord;
-import Model.User;
-import Model.QuizSession;
+import User_Interface.Graphical.GUI;
+import User_Interface.UI;
 
+import java.sql.Connection;
 import java.util.List;
 
 public class MainController {
 
-    int numQuestions = 10;
+    private static final int NUM_QUESTIONS = 10;
 
     private UI ui;
-    private UserRecord userRecord;
+
+    private DatabaseUser databaseUser;
+    private DatabaseQuizSession databaseQuizSession;
+    private DatabaseManager databaseManager;
+    private DatabaseQuestions databaseQuestions;
     private QuestionPool questionPool;
+
     private QuizSession quiz;
     private User user;
-    private InputHelper inHelp;
 
     public MainController() {
 
         GUI gui = new GUI();
         gui.setVisible(true);
         ui = gui;
+        
+        
 
-        // ui = new CUI();
+        Connection connection = databaseManager.getConnection();
 
-        userRecord = new UserRecordFileIO();
-        questionPool = new QuestionPool();
+        databaseUser = new DatabaseUser(connection);
+        databaseQuestions = new DatabaseQuestions(connection);
+        databaseQuizSession = new DatabaseQuizSession(connection);
 
-        inHelp = new InputHelper();
+        questionPool = new QuestionPool(databaseQuestions);
     }
 
     public static void main(String[] args) {
@@ -84,13 +82,13 @@ public class MainController {
         }
     }
 
-    public void startNewGame() {
+    private void startNewGame() {
 
         User inputUser =
             ui.inputNames();
 
         User existing =
-            userRecord.loadRecord(
+            databaseUser.loadRecord(
                 inputUser.getUsername()
             );
 
@@ -101,15 +99,15 @@ public class MainController {
             );
 
             user = existing;
-        }
 
-        else {
+        } else {
+
             user = inputUser;
         }
 
         List<Question> questions =
             questionPool.getRandomQuestions(
-                numQuestions
+                NUM_QUESTIONS
             );
 
         quiz = new QuizSession(
@@ -122,80 +120,70 @@ public class MainController {
         ui.printStory(
             user.getUsername(),
             user.getPetName(),
-
             () -> ui.showQuiz(
                 quiz,
-                () -> finishQuiz()
+                this::finishQuiz
             )
         );
     }
 
-    public void loadGame() {
+    private void loadGame() {
+
         String username =
             ui.inputLoadName();
 
         user =
-            userRecord.loadRecord(
+            databaseUser.loadRecord(
                 username
             );
 
         if (user == null) {
+
             ui.displayError(
-                "No saved game found."
+                "No saved user found."
             );
+
             return;
         }
 
         quiz =
-            userRecord.loadGame(
+            databaseQuizSession.loadGame(
                 user
             );
 
         if (quiz == null) {
+
             ui.displayError(
-                "No saved game found."
+                "No saved quiz found."
             );
+
             return;
         }
 
         ui.showQuiz(
             quiz,
-            () -> finishQuiz()
+            this::finishQuiz
         );
     }
 
     private void finishQuiz() {
-        if (user == null) {
-            user = quiz.getUser();
-        }
+
+        user = quiz.getUser();
 
         user.saveHighestScore(
             quiz.getNumCorrectAnswers()
         );
 
-        userRecord.saveRecord(user);
-        userRecord.saveGame(quiz);
+        databaseUser.saveRecord(user);
+
+        databaseQuizSession.saveGame(
+            quiz
+        );
 
         ui.showEnd(
             quiz,
-            () -> start()
+            this::start
         );
-    }
-
-
-    private void handleExitDuringGame() {
-
-        String save =
-            inHelp.getYesNo(
-                ui,
-                "Save progress? (y/n): "
-            );
-
-        if (save.equalsIgnoreCase("y")) {
-
-            userRecord.saveRecord(user);
-            userRecord.saveGame(quiz);
-        }
     }
 
     public void exit() {

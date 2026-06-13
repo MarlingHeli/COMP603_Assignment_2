@@ -32,8 +32,8 @@ public class QuestionPool {
         );
     }
 
-    public List<Question> getQuestionsFromIDs(String questionIDs) {
-
-        return databaseQuestions.getQuestionsFromIDs(questionIDs);
-    }
+//    public List<Question> getQuestionsFromIDs(String questionIDs) {
+//
+//        return databaseQuestions.getQuestionsFromIDs(questionIDs);
+//    }
 }

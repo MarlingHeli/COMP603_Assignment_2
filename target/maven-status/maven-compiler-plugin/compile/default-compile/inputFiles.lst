@@ -13,6 +13,7 @@ C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\Pers
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\Persistence\UserRecordFileIO.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\Question\MultiChoiceQuestion.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\Question\Question.java
+C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\Question\QuestionFactory.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\Question\QuestionPool.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Console\CUI.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Console\InputHelper.java
@@ -22,6 +23,8 @@ C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\EndPanel.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\GUI.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\IntroPanel.java
+C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\LoadPanel.java
+C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\NameInputPanel.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\QuizPanel.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\Graphical\ResultPanel.java
 C:\Users\hmarl\OneDrive\Documents\GitHub\COMP603_Assignment_2\src\main\java\User_Interface\UI.java
