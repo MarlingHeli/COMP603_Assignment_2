@@ -10,7 +10,7 @@ public class MultiChoiceQuestion implements Question {
     private int correctAnswer;
     private String explanation;
 
-    public MultiChoiceQuestion(int id, String questionText, String answer1, 
+    public MultiChoiceQuestion(int id, String questionText, String answer1,
             String answer2, String answer3, int correctAnswer, String explanation) {
         this.id = id;
         this.questionText = questionText;
@@ -45,9 +45,8 @@ public class MultiChoiceQuestion implements Question {
     public int getQuestionID() {
         return id;
     }
-    
-    public String[] getOptions()
-    {
-        return new String[] {answer1, answer2, answer3};
+
+    public String[] getOptions() {
+        return new String[]{answer1, answer2, answer3};
     }
 }

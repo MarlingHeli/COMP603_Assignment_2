@@ -10,8 +10,7 @@ public class AppStateModel {
     private QuizSession currentQuiz;
     private boolean skipIntro;
 
-    private final List<StateListener> listeners =
-            new ArrayList<>();
+    private final List<StateListener> listeners = new ArrayList<>();
 
     public void addListener(StateListener listener) {
         listeners.add(listener);

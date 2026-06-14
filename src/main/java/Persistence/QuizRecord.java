@@ -8,11 +8,12 @@ package Persistence;
  *
  * @author hmarl
  */
-
 import Model.User;
 import Model.QuizSession;
 
 public interface QuizRecord {
+
     void saveGame(QuizSession session);
+
     QuizSession loadGame(User user);
 }

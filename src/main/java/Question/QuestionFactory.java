@@ -10,11 +10,12 @@ package Question;
  */
 public class QuestionFactory {
 //only has MCQ at the moment. could add true/false later, etc.
-    public Question createMultiChoiceQuestion(int id, String questionText, 
+
+    public Question createMultiChoiceQuestion(int id, String questionText,
             String answer1, String answer2, String answer3, int correctAnswer,
             String explanation) {
-        
+
         return new MultiChoiceQuestion(id, questionText, answer1, answer2, answer3,
-            correctAnswer, explanation  );
+                correctAnswer, explanation);
     }
 }

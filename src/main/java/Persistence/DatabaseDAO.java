@@ -4,20 +4,17 @@
  */
 package Persistence;
 
-
 /**
  *
  * @author hmarl
  */
-
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Base DAO class.
- * Provides common database functionality.
+ * Base DAO class. Provides common database functionality.
  */
 public abstract class DatabaseDAO {
 
@@ -31,9 +28,8 @@ public abstract class DatabaseDAO {
      * Each DAO creates its own table.
      */
     public abstract void createTable();
-    
-//    public abstract boolean usernameExists(String username);
 
+//    public abstract boolean usernameExists(String username);
     /**
      * Check whether a table already exists.
      *
@@ -48,7 +44,7 @@ public abstract class DatabaseDAO {
             String[] types = {"TABLE"};
 
             try (
-                ResultSet resultSet = dbmd.getTables(null, null, null, types)) {
+                    ResultSet resultSet = dbmd.getTables(null, null, null, types)) {
 
                 while (resultSet.next()) {
 
@@ -60,8 +56,7 @@ public abstract class DatabaseDAO {
                     }
                 }
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             System.out.println("Failed to read database metadata");
         }
 

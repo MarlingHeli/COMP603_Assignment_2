@@ -122,13 +122,13 @@ public class DatabaseUser extends DatabaseDAO implements UserRecord {
 
         //using try with resources to automatically close statement
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1,username);
+            statement.setString(1, username);
 
             try (
-                ResultSet resultSet = statement.executeQuery()) {
+                    ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return new User(resultSet.getString("USERNAME"), 
-                            resultSet.getString("PETNAME"), 
+                    return new User(resultSet.getString("USERNAME"),
+                            resultSet.getString("PETNAME"),
                             resultSet.getInt("HIGHSCORE"));
                 }
             }
@@ -140,7 +140,7 @@ public class DatabaseUser extends DatabaseDAO implements UserRecord {
     }
 
 //    @Override
-    public boolean usernameExists(String username ) {
+    public boolean usernameExists(String username) {
 
         String sql = """
             SELECT USERNAME

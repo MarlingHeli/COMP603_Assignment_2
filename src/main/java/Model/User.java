@@ -8,8 +8,8 @@ package Model;
  *
  * @author hmarl
  */
-
 public class User {
+
     private String username;
     private String petName;
     private int highScore;
@@ -20,14 +20,14 @@ public class User {
         this.highScore = highScore;
     }
 
-    public String getUsername() 
-    { 
+    public String getUsername() {
         return username;
     }
-    public String getPetName()
-    { 
+
+    public String getPetName() {
         return petName;
     }
+
     public int getHighScore() {
         return highScore;
     }
@@ -35,20 +35,17 @@ public class User {
     public void setHighScore(int highScore) {
         this.highScore = highScore;
     }
-    
+
     //keep highest ever score only
-    public void saveHighestScore(int numCorrectAnswers)
-    {
-        if (numCorrectAnswers > highScore)
-        {
+    public void saveHighestScore(int numCorrectAnswers) {
+        if (numCorrectAnswers > highScore) {
             highScore = numCorrectAnswers;
         }
     }
-    
+
     //added for when users have existing file but start new game with different pet name
-    public void setPetName(String name)
-    {
+    public void setPetName(String name) {
         this.petName = name;
     }
-    
+
 }

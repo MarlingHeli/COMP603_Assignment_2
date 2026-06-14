@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Question;
+
 /**
  *
  * @author hmarl
@@ -22,18 +23,14 @@ public class QuestionPool {
 
     public List<Question> getRandomQuestions(int numQuestions) {
 
-        List<Question> questions =
-            databaseQuestions.getQuestions();
+        List<Question> questions
+                = databaseQuestions.getQuestions();
 
         Collections.shuffle(questions);
 
         return new ArrayList<>(
-            questions.subList(0, numQuestions)
+                questions.subList(0, numQuestions)
         );
     }
 
-//    public List<Question> getQuestionsFromIDs(String questionIDs) {
-//
-//        return databaseQuestions.getQuestionsFromIDs(questionIDs);
-//    }
 }
