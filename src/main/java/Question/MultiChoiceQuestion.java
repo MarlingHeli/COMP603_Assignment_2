@@ -1,45 +1,41 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Question;
 
-/**
- *
- * @author hmarl
- */
-
 public class MultiChoiceQuestion implements Question {
-    private String questionText;
-    //added explanation text
-    private String explanation;
-    private int answer;
-    private int id;
 
-    public MultiChoiceQuestion(String questionText, String explanation, int answer, int id) {
-        this.questionText = questionText;
-        this.explanation = explanation;
-        this.answer = answer;
+    private int id;
+    private String questionText;
+    private String answer1;
+    private String answer2;
+    private String answer3;
+    private int correctAnswer;
+    private String explanation;
+
+    public MultiChoiceQuestion(int id, String questionText, String answer1,
+            String answer2, String answer3, int correctAnswer, String explanation) {
         this.id = id;
+        this.questionText = questionText;
+        this.answer1 = answer1;
+        this.answer2 = answer2;
+        this.answer3 = answer3;
+        this.correctAnswer = correctAnswer;
+        this.explanation = explanation;
     }
 
     @Override
     public String getQuestionText() {
         return questionText;
     }
-    
+
     @Override
-    public String getExplanation(){
+    public String getExplanation() {
         return explanation;
     }
-    
+
     @Override
     public boolean checkAnswer(String userAnswer) {
         try {
-            //parse string for integer
             int choice = Integer.parseInt(userAnswer.trim());
-            //check if user input (int) matches question's answer
-            return choice == answer;
+            return choice == correctAnswer;
         } catch (NumberFormatException e) {
             return false;
         }
@@ -48,5 +44,9 @@ public class MultiChoiceQuestion implements Question {
     @Override
     public int getQuestionID() {
         return id;
+    }
+
+    public String[] getOptions() {
+        return new String[]{answer1, answer2, answer3};
     }
 }

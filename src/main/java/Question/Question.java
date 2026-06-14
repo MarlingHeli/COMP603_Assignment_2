@@ -8,11 +8,15 @@ package Question;
  *
  * @author hmarl
  */
-
 public interface Question {
+
     String getQuestionText();
-    //added explanation 
+
     String getExplanation();
+
+    String[] getOptions();
+
     boolean checkAnswer(String userAnswer);
+
     int getQuestionID();
 }

@@ -1,3 +1,0 @@
-username=Kris
-petName=Moss
-highScore=10

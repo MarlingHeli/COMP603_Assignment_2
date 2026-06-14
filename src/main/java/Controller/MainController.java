@@ -1,209 +1,169 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- */
-
 package Controller;
 
-/**
- *
- * @author hmarl
- */
-
-import User_Interface.CUI;
-import User_Interface.UI;
-import User_Interface.Menu;
-import User_Interface.InputHelper;
-import User_Interface.StoryPrinter;
+import Model.*;
+import Persistence.*;
 import Question.Question;
 import Question.QuestionPool;
-import Persistence.UserRecordFileIO;
-import Persistence.UserRecord;
-import Model.User;
-import Model.QuizSession;
-
+import User_Interface.Graphical.GUI;
+import javax.swing.JOptionPane;
+import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class MainController {
-    //added variable to easily adjust question size
-    //note: only applies to new games. old games based off size of question id list
-    int numQuestions = 10;
-            
-    private UI ui;
-    private Menu menu;
-    private UserRecord userRecord;
-    private QuestionPool questionPool;
-    private QuizSession quiz;
-    private User user;
-    private InputHelper inHelp;
-    private StoryPrinter storyPrint;
 
-    //define objects in constructor
+    private DatabaseManager databaseManager;
+    private DatabaseUser databaseUser;
+    private DatabaseQuizSession databaseQuizSession;
+    private DatabaseQuestions databaseQuestions;
+    private QuestionPool questionPool;
+    private AppStateModel appState;
+    private GUI gui;
+    private User user;
+    private boolean lastAnswerWasCorrect;
+    private String lastExplanationText;
+
     public MainController() {
-        ui = new CUI();
-        //pass on ui object to be used in menu
-        menu = new Menu(ui);
-        userRecord = new UserRecordFileIO();
-        questionPool = new QuestionPool();
+        appState = new AppStateModel();
+        gui = new GUI(appState, this);
+        databaseManager = new DatabaseManager();
+        Connection connection = databaseManager.getConnection();
+        if (connection == null) {
+            JOptionPane.showMessageDialog(gui,
+                    "Database Connection Error!\nThe database file might be locked by another running instance of the game or IDE.\nPlease close background Java tasks and restart the application.",
+                    "Connection Failure", JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+        databaseUser = new DatabaseUser(connection);
+        databaseQuestions = new DatabaseQuestions(connection);
+        databaseQuizSession = new DatabaseQuizSession(connection);
+        questionPool = new QuestionPool(databaseQuestions);
+        appState.addListener(gui);
     }
 
     public static void main(String[] args) {
         new MainController().start();
     }
 
-    //display menu, will loop until user exits
     public void start() {
-        while (true) {
-            int choice = menu.displayMenu();
+        appState.setState(GameState.MENU);
+    }
 
-            switch (choice) {
-                case 1 -> startNewGame();
-                case 2 -> loadGame();
-                case 3 -> exit();
-                //menu returns -1 if invalid input
-                default -> ui.displayError("Invalid option.");
+    public void handleNewGameSetup() {
+        appState.setState(GameState.NAME_INPUT);
+    }
+
+    public void startNewGame(String username, String petName, boolean skipIntro) {
+        this.user = new User(username, petName, 0);
+        appState.setCurrentUser(user);
+        appState.setSkipIntro(skipIntro);
+        List<Question> questions = questionPool.getRandomQuestions(10);
+        QuizSession quiz = new QuizSession(0, questions, 0, user);
+        appState.setCurrentQuiz(quiz);
+        if (skipIntro) {
+            appState.setState(GameState.QUIZ);
+        } else {
+            appState.setState(GameState.INTRO);
+        }
+    }
+
+    public void proceedToQuiz() {
+        appState.setState(GameState.QUIZ);
+    }
+
+    public void processAnswerSubmission(boolean isCorrect, String explanation) {
+        this.lastAnswerWasCorrect = isCorrect;
+        this.lastExplanationText = explanation;
+        QuizSession session = appState.getCurrentQuiz();
+        if (session != null) {
+            if (isCorrect) {
+                session.answerCorrect();
+            } else {
+                session.answerWrong();
             }
         }
+        appState.setState(GameState.RESULT);
     }
 
-    public void startNewGame() {
-        String username = ui.getUserInput("Enter username: ");
-        String petName = ui.getUserInput("Enter pet name: ");
-        
-        //keep existing highScore if user file already exists
-        user = userRecord.loadRecord(username);
-        //create new user if user file does not exist
-        if (user == null) {
-            user = new User(username, petName, 0);
+    public void advanceFromFeedback() {
+        QuizSession session = appState.getCurrentQuiz();
+        if (session == null || session.isFinished()) {
+            completeQuiz();
+        } else {
+            appState.setState(GameState.QUIZ);
         }
-        //update petName in case users have existing file but want to start
-        //new game and change pet name
-        user.setPetName(petName);
-                
-        //ask to display introduction
-        String introChoice = ui.getUserInput("Enter anything to view "
-                + "introduction, or type \"s\" to skip: ");
-
-        if(!introChoice.equalsIgnoreCase("s")) {
-            storyPrint.showIntro(ui, username, petName);
-        }
-        
-        //fetch generated questions with size as arg
-        List<Question> questions = questionPool.getRandomQuestions(numQuestions);
-        ui.displayText("\nQuest: You will now attempt the Java competition!");
-        ui.getUserInput("Enter anything to continue...");
-        ui.displayText("");
-        
-        //create QuizSession object
-        quiz = new QuizSession(0, questions, 0, user);
-        //TESTING HIGHSCORE
-//        System.out.println("HIGHSCORE "+ quiz.getUser().getHighScore());
-        runQuiz();
     }
-    
+
+    public void completeQuiz() {
+        QuizSession quiz = appState.getCurrentQuiz();
+        if (quiz != null) {
+            // Ask the player explicitly if they want to update and save their score values to high score tracking
+            int saveScoreChoice = JOptionPane.showConfirmDialog(gui,
+                    "Congratulations on finishing! Would you like to save your final quiz score to the leaderboard database?",
+                    "Save Score", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (saveScoreChoice == JOptionPane.YES_OPTION) {
+                quiz.updateHighScore();
+                databaseUser.saveRecord(user);
+                // Cleanly delete active saved state history upon completion to avoid loaded resume loop exceptions
+                databaseQuizSession.deleteSession(user.getUsername());
+            }
+        }
+        appState.setState(GameState.END);
+    }
+
+    public void showLeaderboard() {
+        appState.setState(GameState.LEADERBOARD);
+    }
+    // Intercepts database mappings and forwards parsed map values to UI panels
+
+    public HashMap<String, Integer> fetchLeaderboardScores() {
+        return databaseManager.getHighScores();
+    }
 
     public void loadGame() {
-        String username = ui.getUserInput("Enter username: ");
-        //attempt to load save file
-        user = userRecord.loadRecord(username);
-        quiz = userRecord.loadGame(username);
-        //return if no save file found corresponding to user
-        if (quiz == null || user == null) {
-            ui.displayError("No saved game found.\n");
-            return;
-        }
-        
-        ui.displayText("Saved File Found!!");
-        ui.slowPrint("Returning where you left off...\n");
-        
-        runQuiz();
+        appState.setState(GameState.LOAD_SCREEN);
     }
 
-    private void runQuiz() {
-        //fetch generated questions
-        List<Question> questions = quiz.getQuestions();
+    public User verifyAndFetchUser(String username) {
+        return databaseUser.loadRecord(username);
+    }
 
-        //iterate through questions list, starting at CurrentQuestionIndex
-        //suitable for continuing off a save file and starting new game
-        for (int i = quiz.getCurrentQuestionIndex(); i < questions.size(); i++) {         
-            //get Question object (element) at index i in questions list
-            Question q = questions.get(i);
-            int questionNumber = i + 1;
-            //display current question number starting at 1
-            ui.displayText("\n=== QUESTION: "+ questionNumber + " ===");
-            //get question text
-            ui.displayText(q.getQuestionText());
+    public QuizSession fetchSavedSession(User targetedUser) {
+        return databaseQuizSession.loadGame(targetedUser);
+    }
 
-            String input = inHelp.getQuizAnswer(ui);
-            
-            //check user input
-            if (input.equalsIgnoreCase("quit"))
-            {
-                handleExitDuringGame();
-                return;
+    public void resumeLoadedQuiz(User gameUser, QuizSession restoredQuiz) {
+        this.user = gameUser;
+        appState.setCurrentUser(this.user);
+        appState.setCurrentQuiz(restoredQuiz);
+        appState.setState(GameState.QUIZ);
+    }
+
+    public void saveAndExit() {
+        QuizSession currentSession = appState.getCurrentQuiz();
+        if (currentSession != null && user != null) {
+            try {
+                databaseUser.saveRecord(user);
+                databaseQuizSession.saveGame(currentSession);
+                JOptionPane.showMessageDialog(gui, "Game progression saved successfully for " + user.getUsername() + "!", "Save Complete", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(gui, "Failed to save game data progression records properly.", "Save Error", JOptionPane.ERROR_MESSAGE);
             }
-            //check if user answer matches answer
-            else if (q.checkAnswer(input)) {
-                quiz.answerCorrect();
-                ui.displayText("Correct!");
-            } 
-            else 
-            {
-                quiz.answerWrong();
-                ui.displayText("Incorrect.");
-            }
-            
-            //display question explanation
-            ui.displayText(questions.get(i).getExplanation());
-            //display current score
-            ui.displayText("Score: " + quiz.getNumCorrectAnswers()+ "/"
-                    + questions.size());
-            ui.getUserInput("Enter anything to continue:");
         }
-
-        //goes to finishQuiz if users try to load a game that has already finished
-        finishQuiz();   // occurs after all questions
+        exit();
     }
 
-    private void finishQuiz() {
-//        int score = quiz.getNumCorrectAnswers();
-//        int totalQuestions = quiz.getQuestions().size();
-        //get trophy type
-        String result = quiz.calculateResult();
-        
-        ui.displayText("\n=== RESULTS ===");
-        // 1. Show score + result
-        ui.displayText(quiz.getScoreText());
-        ui.displayText("Result: " + result + "\n");
-        
-        //play a concluding scene from bro
-                
-        //only keep highest score in user file
-        user.saveHighestScore(quiz.getNumCorrectAnswers());
-        //save game
-        userRecord.saveRecord(user);
-        userRecord.saveGame(quiz);
-        
-        // 3. Ask to continue
-        //added error checking
-        String continueChoice = inHelp.getYesNo(ui, "Would you like to like to return to menu? (y/n): ");
-
-        if (continueChoice.equalsIgnoreCase("n")) {
-            exit();
-        }
-        // if yes -> returns to menu automatically because of while true loop
+    public boolean isLastAnswerCorrect() {
+        return lastAnswerWasCorrect;
     }
 
-    private void handleExitDuringGame() {
- 
-        String save = inHelp.getYesNo(ui, "Save progress? (y/n): ");
-        if (save.equalsIgnoreCase("y")) {
-            userRecord.saveRecord(user);
-            userRecord.saveGame(quiz);
-        }
+    public String getLastExplanationText() {
+        return lastExplanationText;
     }
 
     public void exit() {
-        ui.displayText("Thanks for playing!");
+        databaseManager.close();
         System.exit(0);
     }
 }
