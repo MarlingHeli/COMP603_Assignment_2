@@ -9,7 +9,7 @@ package Persistence;
  * @author hmarl
  */
 import Model.User;
-import Model.QuizSession;
+//import Model.QuizSession;
 
 public interface UserRecord {
 

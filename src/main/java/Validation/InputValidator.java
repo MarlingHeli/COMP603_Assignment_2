@@ -11,13 +11,6 @@ package Validation;
 
 public class InputValidator {
 
-//    public static boolean validUsername(
-//        String username
-//    ) {
-//        return username != null
-//            && !username.trim().isEmpty();
-//    }
-    
      public static boolean validStr(
         String str
     ) {
